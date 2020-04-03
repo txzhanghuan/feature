@@ -1,0 +1,73 @@
+package engine;
+
+import engine.co.AbstractFeatureBean;
+import engine.co.FeatureContext;
+import engine.processor.FeatureProcessor;
+import engine.properties.FeatureProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author 阿桓
+ * Date: 2020/3/25
+ * Time: 9:08 下午
+ * Description:
+ */
+@Component
+@Slf4j
+public class FeatureEngine implements InitializingBean {
+
+    @Autowired
+    private FeatureProperties featureProperties;
+
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+
+    private int index = 0;
+
+    private ThreadPoolExecutor calcPool;
+
+    @Autowired
+    FeatureProcessor featureProcessor;
+
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures){
+        log.info("Start calculate!");
+        FeatureContext featureContext = new FeatureContext();
+        featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
+        try {
+            featureContext.executeAll(featureProperties.getCalcTimeout(), MDC.getCopyOfContextMap());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return featureContext.getCalcResult();
+    }
+
+    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean){
+        log.info("Start calculate!");
+        FeatureContext featureContext = new FeatureContext();
+        featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);
+        try {
+            featureContext.executeAll(featureProperties.getCalcTimeout(), MDC.getCopyOfContextMap());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return featureContext.getCalcResult();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        calcPool = new ThreadPoolExecutor(featureProperties.getFeatureThreadPoolSize(), featureProperties.getFeatureThreadPoolMaxSize(), 0,
+                TimeUnit.SECONDS, queue, r -> new Thread(r, "feature-pool-" + index++)
+        );
+    }
+}
