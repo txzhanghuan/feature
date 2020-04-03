@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  * Description:
  */
 @Configuration
-@ConditionalOnProperty(name = "enabled.autoConfituration", matchIfMissing = true)
+@ConditionalOnProperty(name = "enabled.autoConfiguration", matchIfMissing = true)
 @ConditionalOnClass({FeatureEngine.class})
 @EnableConfigurationProperties(FeatureProperties.class)
 public class FeatureAutoConfiguration {
