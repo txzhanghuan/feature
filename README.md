@@ -52,7 +52,7 @@ public class Test {
 通过Spring自动注入FeatureEngine，需要**originDataMap**原始数据 和**calcFeatures**需要被计算的变量名称。
 返回一个计算完成的变量Map。
 默认使用线程池进行并行计算（确保拓扑顺序），线程数为机器的核心数✖️2，可通过feature.featureThreadPoolSize更改。
-现版本无法解决环依赖问题。
+现版本无法解决循环依赖问题。
 
 ```Java
 @Service
