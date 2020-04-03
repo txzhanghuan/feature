@@ -4,6 +4,8 @@ import engine.co.AbstractFeatureBean;
 import engine.co.FeatureContext;
 import engine.processor.FeatureProcessor;
 import engine.properties.FeatureProperties;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,7 +29,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class FeatureEngine implements InitializingBean {
 
-    @Autowired
+    @Getter
+    @Setter
     private FeatureProperties featureProperties;
 
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
