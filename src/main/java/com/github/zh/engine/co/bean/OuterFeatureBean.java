@@ -1,6 +1,6 @@
-package engine.co.bean;
+package com.github.zh.engine.co.bean;
 
-import engine.co.AbstractFeatureBean;
+import com.github.zh.engine.co.AbstractFeatureBean;
 
 import java.util.function.Function;
 

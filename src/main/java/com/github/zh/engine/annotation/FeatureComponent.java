@@ -1,4 +1,4 @@
-package engine.annotation;
+package com.github.zh.engine.annotation;
 
 import org.springframework.stereotype.Component;
 

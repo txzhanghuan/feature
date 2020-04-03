@@ -1,8 +1,8 @@
-package engine.co;
+package com.github.zh.engine.co;
 
 
-import engine.enums.FeatureEnums;
-import engine.enums.FeatureStates;
+import com.github.zh.engine.enums.FeatureEnums;
+import com.github.zh.engine.enums.FeatureStates;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
