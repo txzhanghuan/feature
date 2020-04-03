@@ -76,7 +76,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
 
                 log.info("Feature bean construct success : {}", nativeFeatureBean.toString());
             } catch (Exception e) {
-                log.error("Generate class error: {} ", feature.name(), e);
+                log.error("Generate feature error: {} ", feature.name(), e);
             }
         });
 

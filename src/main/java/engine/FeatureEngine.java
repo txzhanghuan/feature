@@ -40,11 +40,15 @@ public class FeatureEngine implements InitializingBean {
     FeatureProcessor featureProcessor;
 
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures){
+        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout());
+    }
+
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout){
         log.info("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
         try {
-            featureContext.executeAll(featureProperties.getCalcTimeout(), MDC.getCopyOfContextMap());
+            featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -53,11 +57,17 @@ public class FeatureEngine implements InitializingBean {
 
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean){
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout());
+    }
+
+    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean,
+                                                        long timeout){
         log.info("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);
         try {
-            featureContext.executeAll(featureProperties.getCalcTimeout(), MDC.getCopyOfContextMap());
+            featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
