@@ -1,4 +1,4 @@
-package engine.clz;
+package com.github.zh.engine.clz;
 
 import javassist.*;
 import org.springframework.stereotype.Component;

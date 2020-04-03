@@ -1,8 +1,8 @@
-package engine.co.bean;
+package com.github.zh.engine.co.bean;
 
-import engine.annotation.Feature;
-import engine.clz.IFeature;
-import engine.co.AbstractFeatureBean;
+import com.github.zh.engine.annotation.Feature;
+import com.github.zh.engine.clz.IFeature;
+import com.github.zh.engine.co.AbstractFeatureBean;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

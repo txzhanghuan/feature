@@ -1,11 +1,11 @@
-package engine.processor;
+package com.github.zh.engine.processor;
 
-import engine.annotation.Feature;
-import engine.annotation.FeatureComponent;
-import engine.clz.FeatureClassGenerator;
-import engine.clz.IFeature;
-import engine.co.AbstractFeatureBean;
-import engine.co.bean.NativeFeatureBean;
+import com.github.zh.engine.annotation.Feature;
+import com.github.zh.engine.annotation.FeatureComponent;
+import com.github.zh.engine.clz.FeatureClassGenerator;
+import com.github.zh.engine.clz.IFeature;
+import com.github.zh.engine.co.AbstractFeatureBean;
+import com.github.zh.engine.co.bean.NativeFeatureBean;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
