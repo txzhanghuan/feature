@@ -24,7 +24,8 @@ D --依赖--> E --依赖--> C（已经计算完成，不用再次计算）
 ## 用法
 
 通过标注@Feature的形式，将方法转化为一个变量。
-
+下面代码表示test5变量依赖test4变量，test4变量无入参，可直接计算，当我只需要计算test5变量的时候，计算引擎会根据变量的依赖关系，生成一个DAG图，
+即test5-依赖->test4 那么计算引擎会自动计算test4的值，并且把test4的值放入test5的入参中让其计算。
 ```Java
 @FeatureComponent
 public class Test {
