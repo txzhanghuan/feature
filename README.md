@@ -82,7 +82,6 @@ public class FeatureService {
     "test5"
   ],
   "initData": {
-  	"zh":1
   }
 }
 ```
@@ -90,7 +89,6 @@ public class FeatureService {
 ```json
 {
     "test4": 1,
-    "test5": 2,
-    "zh": 1
+    "test5": 2
   }
 ```
