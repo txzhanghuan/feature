@@ -1,0 +1,25 @@
+#IDEA 文件
+/.idea
+
+#所有的CLASS
+*.class
+**/target/
+
+#所有的Jar
+*.jar
+
+#所有的日志
+*.log
+
+*.iml
+
+#Eclipse文件
+.classpath
+.factorypath
+.project
+
+#VSCODE文件
+**/.settings
+/.vscode
+practice.code-workspace
+*.lst
