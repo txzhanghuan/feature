@@ -6,7 +6,7 @@
 
     <groupId>com.github.zh</groupId>
     <artifactId>feature-spring-boot-starter</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <build>
         <plugins>
             <plugin>
