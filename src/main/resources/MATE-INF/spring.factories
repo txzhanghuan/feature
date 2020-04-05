@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-FeatureAutoConfiguration,
-FeatureEngine,
-FeatureProcessor
+com.github.zh.engine.config.FeatureAutoConfiguration,
+com.github.zh.engine.FeatureEngine,
+com.github.zh.engine.processor.FeatureProcessor
