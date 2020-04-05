@@ -2,13 +2,9 @@ package com.github.zh.engine.config;
 
 import com.github.zh.engine.FeatureEngine;
 import com.github.zh.engine.properties.FeatureProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -21,18 +17,6 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "enabled.autoConfiguration", matchIfMissing = true)
 @ConditionalOnClass({FeatureEngine.class})
 @EnableConfigurationProperties(FeatureProperties.class)
-@ComponentScan("engine")
 public class FeatureAutoConfiguration {
-
-    @Autowired
-    private FeatureProperties featureProperties;
-
-    @Bean
-    @ConditionalOnMissingBean
-    public FeatureEngine getFeatureEngine(){
-        FeatureEngine featureEngine = new FeatureEngine();
-        featureEngine.setFeatureProperties(featureProperties);
-        return featureEngine;
-    }
 
 }

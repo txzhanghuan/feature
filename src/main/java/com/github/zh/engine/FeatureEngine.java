@@ -29,8 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class FeatureEngine implements InitializingBean {
 
-    @Getter
-    @Setter
+    @Autowired
     private FeatureProperties featureProperties;
 
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
