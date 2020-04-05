@@ -15,6 +15,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -77,8 +78,10 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                         .returnType(it.getReturnType())
                         .build();
 
-                for (FeaturePostProcessor featurePostProcessor : featurePostProcessorList) {
-                    nativeFeatureBean = featurePostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean, feature.name());
+                if(!CollectionUtils.isEmpty(featurePostProcessorList)) {
+                    for (FeaturePostProcessor featurePostProcessor : featurePostProcessorList) {
+                        nativeFeatureBean = featurePostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean, feature.name());
+                    }
                 }
 
                 if(nativeFeatureBean != null) {
