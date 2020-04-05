@@ -6,6 +6,7 @@ import com.github.zh.engine.clz.FeatureClassGenerator;
 import com.github.zh.engine.clz.IFeature;
 import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.bean.NativeFeatureBean;
+import com.github.zh.engine.interfaces.FeaturePostProcessor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -20,6 +21,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,9 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
 
     @Autowired
     FeatureClassGenerator featureClassGenerator;
+
+    @Autowired
+    List<FeaturePostProcessor> featurePostProcessorList;
 
     @Getter
     private ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
@@ -72,9 +77,15 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                         .returnType(it.getReturnType())
                         .build();
 
-                featureBeanMap.put(feature.name(), nativeFeatureBean);
+                for (FeaturePostProcessor featurePostProcessor : featurePostProcessorList) {
+                    nativeFeatureBean = featurePostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean, feature.name());
+                }
 
-                log.info("Feature bean construct success : {}", nativeFeatureBean.toString());
+                if(nativeFeatureBean != null) {
+                    featureBeanMap.put(feature.name(), nativeFeatureBean);
+                }
+
+                log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean).toString());
             } catch (Exception e) {
                 log.error("Generate feature error: {} ", feature.name(), e);
             }
