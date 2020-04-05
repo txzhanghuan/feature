@@ -36,7 +36,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
     @Autowired
     FeatureClassGenerator featureClassGenerator;
 
-    @Autowired
+    @Autowired(required = false)
     List<FeaturePostProcessor> featurePostProcessorList;
 
     @Getter
