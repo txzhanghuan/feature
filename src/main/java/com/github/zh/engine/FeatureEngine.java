@@ -44,7 +44,7 @@ public class FeatureEngine implements InitializingBean {
     }
 
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout){
-        log.info("Start calculate!");
+        log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
         try {
@@ -63,7 +63,7 @@ public class FeatureEngine implements InitializingBean {
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean,
                                                         long timeout){
-        log.info("Start calculate!");
+        log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);
         try {

@@ -8,4 +8,12 @@ package com.github.zh.engine.exception;
  */
 public class CalculateException extends RuntimeException {
 
+    public CalculateException(String message) {
+        super(message);
+    }
+
+    public CalculateException(Throwable e) {
+        super(e);
+    }
+
 }
