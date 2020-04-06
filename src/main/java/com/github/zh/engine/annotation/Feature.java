@@ -17,4 +17,11 @@ public @interface Feature {
      * @return
      */
     String name();
+
+    /**
+     * 变量的描述
+     *
+     * @return
+     */
+    String description() default "";
 }

@@ -31,7 +31,6 @@ public class FeatureClassGenerator {
                                                    String featureMethodName, String realMethodName)
             throws NotFoundException, CannotCompileException {
 
-//        String paramsMetaStr = constructByMethodParam(parameterTypes, parameters);
         String params = constructByParam(parameterTypes, parameters);
         String compileMethod = String.format(TEMPLATE_METHOD, catalogClassName, realMethodName, params);
         String className = convert2CamelCase(featureMethodName);

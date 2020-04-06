@@ -2,6 +2,7 @@ package com.github.zh.engine.co;
 
 import com.github.zh.engine.enums.FeatureEnums;
 import com.github.zh.engine.enums.FeatureStates;
+import com.github.zh.engine.exception.CalculateException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class FeatureContext {
      */
     public void executeAll(long timeout, Map<String, String> logContext) throws InterruptedException {
         if (canCalcFeaturesCount == 0) {
-            throw new RuntimeException("无变量需计算");
+            throw new CalculateException("无变量需计算");
         }
         featureEntitiesPool.values().forEach(
                 featureEntity -> CompletableFuture.runAsync(
@@ -53,7 +54,7 @@ public class FeatureContext {
                         , pool)
         );
         if(!this.countDownLatch.await(timeout, TimeUnit.MILLISECONDS)){
-            throw new RuntimeException("计算超时");
+            throw new CalculateException("计算超时");
         };
     }
 
@@ -210,7 +211,7 @@ public class FeatureContext {
         while(!queue.isEmpty()){
             String parent = queue.poll();
             if(!featureBeanMap.containsKey(parent) && !featureEntitiesPool.containsKey(parent)){
-                throw new RuntimeException(String.format("缺少Feature或者输入参数: %s", parent));
+                throw new CalculateException(String.format("缺少Feature或者输入参数: %s", parent));
             }
             FeatureEntity featureEntity = FeatureEntity.builder()
                     .featureContext(this)
@@ -242,7 +243,7 @@ public class FeatureContext {
                             && it.getError()!=null).findFirst().get();
             String errorFeature = getRootErrorFeature(featureEntity);
             log.error("计算失败，失败根结点变量:{}", errorFeature, featureEntitiesPool.get(errorFeature).getError());
-            throw new RuntimeException(featureEntitiesPool.get(errorFeature).getError());
+            throw new CalculateException(featureEntitiesPool.get(errorFeature).getError());
         }
         Map<String, Object> resulsMap = new HashMap<>(1<<4);
         featureEntitiesPool.forEach((key, value) -> resulsMap.put(key, value.getResult()));

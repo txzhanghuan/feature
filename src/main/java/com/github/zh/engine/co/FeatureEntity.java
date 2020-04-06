@@ -57,7 +57,7 @@ public class FeatureEntity {
         //检查Context是否已经失败
         if(this.featureContext.isFastFail()){
             if(status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)){
-                log.info("Feature: {}， 快速失败.", featureBean.getName());
+                log.debug("Feature: {}， 快速失败.", featureBean.getName());
                 this.featureContext.getCountDownLatch().countDown();
 
                 MDC.clear();
