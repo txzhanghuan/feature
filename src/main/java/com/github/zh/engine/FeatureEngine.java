@@ -1,11 +1,9 @@
 package com.github.zh.engine;
 
+import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.FeatureContext;
 import com.github.zh.engine.processor.FeatureProcessor;
-import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.properties.FeatureProperties;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
