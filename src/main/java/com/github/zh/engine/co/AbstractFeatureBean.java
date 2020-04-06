@@ -15,9 +15,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class AbstractFeatureBean implements IFeatureBean{
+public abstract class AbstractFeatureBean implements IFeatureBean {
 
     protected String name;
+
+    protected String description;
 
     protected List<String> parents;
 
