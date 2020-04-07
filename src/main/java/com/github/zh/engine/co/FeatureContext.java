@@ -236,7 +236,7 @@ public class FeatureContext {
         }
     }
 
-    public Map<String, Object> getCalcResult(){
+    private void checkFail() {
         if (fastFail) {
             FeatureEntity featureEntity = featureEntitiesPool.values().stream().filter(
                     it -> it.getStatus().get().equals(FeatureStates.FAILED)
@@ -245,16 +245,24 @@ public class FeatureContext {
             log.error("计算失败，失败根结点变量:{}", errorFeature, featureEntitiesPool.get(errorFeature).getError());
             throw new CalculateException(featureEntitiesPool.get(errorFeature).getError());
         }
-        Map<String, Object> resultMap = new HashMap<>();
-        featureEntitiesPool.entrySet().stream().filter(
-                entry -> entry.getValue().getFeatureBean().isOutput()
-        ).forEach(entry -> resultMap.put(entry.getKey(), entry.getValue().getResult()));
+    }
+
+    public Map<String, Object> getCalcResult(boolean debug) {
+        checkFail();
+        Map<String, Object> resultMap = new HashMap<>(canCalcFeaturesCount);
+        if (debug) {
+            featureEntitiesPool.forEach((key, featureEntity) -> resultMap.put(key, featureEntity.getResult()));
+        } else {
+            featureEntitiesPool.entrySet().stream().filter(
+                    entry -> entry.getValue().getFeatureEnum() != FeatureEnums.ORIGIN_DATA && entry.getValue().getFeatureBean().isOutput()
+            ).forEach(entry -> resultMap.put(entry.getKey(), entry.getValue().getResult()));
+        }
         return resultMap;
     }
 
-    public String getRootErrorFeature(FeatureEntity featureEntity){
+    public String getRootErrorFeature(FeatureEntity featureEntity) {
         FeatureEntity tempFeatureEntity = featureEntity;
-        while(tempFeatureEntity.getErrorParent()!=null){
+        while (tempFeatureEntity.getErrorParent() != null) {
             tempFeatureEntity = featureEntitiesPool.get(tempFeatureEntity.getErrorParent());
         }
         return tempFeatureEntity.getFeatureBean().getName();

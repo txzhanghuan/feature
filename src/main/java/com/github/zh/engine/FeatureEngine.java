@@ -40,25 +40,50 @@ public class FeatureEngine implements InitializingBean {
     FeatureProcessor featureProcessor;
 
     /**
-     * 计算变量（仅本地FeatureBean），带入默认的超时时间
+     * 计算变量（仅本地FeatureBean）
      *
-     * @param originDataMap
-     * @param calcFeatures
+     * @param originDataMap 原始数据
+     * @param calcFeatures  待计算变量集合
      * @return
      */
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures) {
-        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout());
+        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), false);
     }
 
     /**
      * 计算变量（仅本地FeatureBean）
      *
-     * @param originDataMap
-     * @param calcFeatures
-     * @param timeout
+     * @param originDataMap 原始数据
+     * @param calcFeatures  待计算变量集合
+     * @param timeout       超时时间
      * @return
      */
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout) {
+        return this.calc(originDataMap, calcFeatures, timeout, false);
+    }
+
+    /**
+     * 计算变量（仅本地FeatureBean）
+     *
+     * @param originDataMap 原始数据
+     * @param calcFeatures  待计算变量集合
+     * @param debug         是否debug模式
+     * @return
+     */
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, boolean debug) {
+        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), debug);
+    }
+
+    /**
+     * 计算变量（仅本地FeatureBean）
+     *
+     * @param originDataMap 原始数据
+     * @param calcFeatures  待计算变量集合
+     * @param timeout       超时时间
+     * @param debug         是否debug模式
+     * @return
+     */
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
@@ -67,34 +92,63 @@ public class FeatureEngine implements InitializingBean {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return featureContext.getCalcResult();
-    }
-
-    /**
-     * 计算变量（本地FeatureBean和外部带入的Bean），默认的超时时间
-     *
-     * @param originDataMap
-     * @param calcFeatures
-     * @param outerFeatureBean
-     * @return
-     */
-    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
-                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean) {
-        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout());
+        return featureContext.getCalcResult(debug);
     }
 
     /**
      * 计算变量（本地FeatureBean和外部带入的Bean）
      *
-     * @param originDataMap
-     * @param calcFeatures
-     * @param outerFeatureBean
-     * @param timeout
+     * @param originDataMap    原始数据
+     * @param calcFeatures     待计算变量集合
+     * @param outerFeatureBean 外部带入的计算Bean
+     * @return
+     */
+    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean) {
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), false);
+    }
+
+    /**
+     * 计算变量（本地FeatureBean和外部带入的Bean）
+     *
+     * @param originDataMap    原始数据
+     * @param calcFeatures     待计算变量集合
+     * @param outerFeatureBean 外部带入的计算Bean
+     * @param timeout          超时时间
+     * @return
+     */
+    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean, long timeout) {
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, timeout, false);
+    }
+
+    /**
+     * 计算变量（本地FeatureBean和外部带入的Bean）
+     *
+     * @param originDataMap    原始数据
+     * @param calcFeatures     待计算变量集合
+     * @param outerFeatureBean 外部带入的计算Bean
+     * @param debug            是否debug模式
+     * @return
+     */
+    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean, boolean debug) {
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), debug);
+    }
+
+    /**
+     * 计算变量（本地FeatureBean和外部带入的Bean）
+     *
+     * @param originDataMap    原始数据
+     * @param calcFeatures     待计算变量集合
+     * @param outerFeatureBean 外部带入的计算Bean
+     * @param timeout          超时时间
+     * @param debug            是否debug模式
      * @return
      */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean,
-                                                        long timeout) {
+                                                        long timeout, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);
@@ -103,7 +157,7 @@ public class FeatureEngine implements InitializingBean {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return featureContext.getCalcResult();
+        return featureContext.getCalcResult(debug);
     }
 
     @Override
