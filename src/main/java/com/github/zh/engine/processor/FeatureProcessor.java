@@ -67,8 +67,10 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 //实例化
                 IFeature featureObject = (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
 
-                //构建FeatureBean
+                //初始化父节点
                 List<String> parents = Arrays.stream(it.getParameters()).map(Parameter::getName).collect(Collectors.toList());
+
+                //构建FeatureBean
                 NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
                         .feature(featureObject)
                         .name(feature.name())
@@ -79,6 +81,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                         .returnType(it.getReturnType())
                         .build();
 
+                //寻找Feature后处理器
                 if(!CollectionUtils.isEmpty(featurePostProcessorList)) {
                     for (FeaturePostProcessor featurePostProcessor : featurePostProcessorList) {
                         nativeFeatureBean = featurePostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean, feature.name());
