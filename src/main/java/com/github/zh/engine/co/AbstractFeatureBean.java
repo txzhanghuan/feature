@@ -19,7 +19,7 @@ public abstract class AbstractFeatureBean implements IFeatureBean {
 
     protected String name;
 
-    protected String description;
+    protected boolean output;
 
     protected List<String> parents;
 

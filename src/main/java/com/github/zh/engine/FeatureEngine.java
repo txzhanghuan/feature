@@ -39,11 +39,26 @@ public class FeatureEngine implements InitializingBean {
     @Autowired
     FeatureProcessor featureProcessor;
 
-    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures){
+    /**
+     * 计算变量（仅本地FeatureBean），带入默认的超时时间
+     *
+     * @param originDataMap
+     * @param calcFeatures
+     * @return
+     */
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures) {
         return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout());
     }
 
-    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout){
+    /**
+     * 计算变量（仅本地FeatureBean）
+     *
+     * @param originDataMap
+     * @param calcFeatures
+     * @param timeout
+     * @return
+     */
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
@@ -55,14 +70,31 @@ public class FeatureEngine implements InitializingBean {
         return featureContext.getCalcResult();
     }
 
+    /**
+     * 计算变量（本地FeatureBean和外部带入的Bean），默认的超时时间
+     *
+     * @param originDataMap
+     * @param calcFeatures
+     * @param outerFeatureBean
+     * @return
+     */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
-                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean){
+                                                        Map<String, ? extends AbstractFeatureBean> outerFeatureBean) {
         return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout());
     }
 
+    /**
+     * 计算变量（本地FeatureBean和外部带入的Bean）
+     *
+     * @param originDataMap
+     * @param calcFeatures
+     * @param outerFeatureBean
+     * @param timeout
+     * @return
+     */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean,
-                                                        long timeout){
+                                                        long timeout) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
         featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);

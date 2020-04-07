@@ -28,10 +28,10 @@ public class NativeFeatureBean extends AbstractFeatureBean {
     private Class<?> returnType;
 
     @Builder
-    public NativeFeatureBean(String name, String description, List<String> parents,
+    public NativeFeatureBean(String name, boolean output, List<String> parents,
                              List<String> children, Feature featureMetaData, IFeature feature,
                              Class<?> returnType) {
-        super(name, description, parents, children);
+        super(name, output, parents, children);
         this.featureMetaData = featureMetaData;
         this.feature = feature;
         this.returnType = returnType;

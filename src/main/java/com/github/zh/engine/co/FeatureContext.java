@@ -237,17 +237,19 @@ public class FeatureContext {
     }
 
     public Map<String, Object> getCalcResult(){
-        if(fastFail){
+        if (fastFail) {
             FeatureEntity featureEntity = featureEntitiesPool.values().stream().filter(
                     it -> it.getStatus().get().equals(FeatureStates.FAILED)
-                            && it.getError()!=null).findFirst().get();
+                            && it.getError() != null).findFirst().get();
             String errorFeature = getRootErrorFeature(featureEntity);
             log.error("计算失败，失败根结点变量:{}", errorFeature, featureEntitiesPool.get(errorFeature).getError());
             throw new CalculateException(featureEntitiesPool.get(errorFeature).getError());
         }
-        Map<String, Object> resulsMap = new HashMap<>(1<<4);
-        featureEntitiesPool.forEach((key, value) -> resulsMap.put(key, value.getResult()));
-        return resulsMap;
+        Map<String, Object> resultMap = new HashMap<>();
+        featureEntitiesPool.entrySet().stream().filter(
+                entry -> entry.getValue().getFeatureBean().isOutput()
+        ).forEach(entry -> resultMap.put(entry.getKey(), entry.getValue().getResult()));
+        return resultMap;
     }
 
     public String getRootErrorFeature(FeatureEntity featureEntity){

@@ -74,7 +74,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
                         .feature(featureObject)
                         .name(feature.name())
-                        .description(feature.description())
+                        .output(feature.output())
                         .parents(parents)
                         .children(new ArrayList<>())
                         .featureMetaData(feature)
