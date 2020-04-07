@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * @author zhanghuan
  * @created 2020/01/27
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
