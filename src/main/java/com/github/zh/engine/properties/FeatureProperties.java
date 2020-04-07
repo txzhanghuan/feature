@@ -21,7 +21,7 @@ public class FeatureProperties {
     public static final Integer DEFAULT_SYSTEM_CORE_SIZE = Runtime.getRuntime().availableProcessors();
 
     /**
-     * 默认计算超时时间
+     * 默认计算超时时间（MS）
      */
     public static final Integer DEFAULT_CALC_TIMEOUT = 10000;
 

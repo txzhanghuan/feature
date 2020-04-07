@@ -24,4 +24,11 @@ public @interface Feature {
      * @return
      */
     String description() default "";
+
+    /**
+     * 结果是否输出
+     *
+     * @return
+     */
+    boolean output() default true;
 }
