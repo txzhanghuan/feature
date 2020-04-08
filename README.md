@@ -145,7 +145,7 @@ public class FeatureService {
 #### 本地计算FeatureBean后置处理器
 
 ```Java
-public interface FeaturePostProcessor {
+public interface FeaturePostProcessor{
 
     @Nullable
     default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(T featureBean, String featureBeanName) throws BeansException {
