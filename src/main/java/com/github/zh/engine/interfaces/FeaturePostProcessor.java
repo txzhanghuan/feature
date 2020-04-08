@@ -13,7 +13,7 @@ import org.springframework.lang.Nullable;
 public interface FeaturePostProcessor {
 
     @Nullable
-    default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(T featureBean, String featureBeanName) throws BeansException {
+    default AbstractFeatureBean postProcessAfterInitializationFeature(AbstractFeatureBean featureBean, String featureBeanName) throws BeansException {
         return featureBean;
     }
 }
