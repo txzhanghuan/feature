@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * Description:
  */
 @Data
-@ConfigurationProperties(prefix = "com.github.zh.feature")
+@ConfigurationProperties(prefix = "com.github.zh.engine.feature")
 @Configuration
 public class FeatureProperties {
 
