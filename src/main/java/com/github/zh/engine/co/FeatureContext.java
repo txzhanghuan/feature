@@ -55,7 +55,7 @@ public class FeatureContext {
         );
         if(!this.countDownLatch.await(timeout, TimeUnit.MILLISECONDS)){
             throw new CalculateException("计算超时");
-        };
+        }
     }
 
     /**
@@ -139,6 +139,9 @@ public class FeatureContext {
      * @param originDataMap
      */
     private void initOriginData(Map<String, Object> originDataMap) {
+        if (originDataMap == null) {
+            return;
+        }
         originDataMap.forEach((key, value) -> {
             FeatureEntity featureEntity = FeatureEntity.builder()
                     .featureContext(this)

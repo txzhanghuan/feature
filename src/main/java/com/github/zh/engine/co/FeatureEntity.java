@@ -46,17 +46,19 @@ public class FeatureEntity {
 
     public void execute(Map<String,String> logContext){
 
-        MDC.setContextMap(logContext);
+        if (logContext != null) {
+            MDC.setContextMap(logContext);
+        }
 
         //判断是否初始状态
-        if(!status.get().equals(FeatureStates.INIT)){
+        if (!status.get().equals(FeatureStates.INIT)) {
             MDC.clear();
-            return ;
+            return;
         }
 
         //检查Context是否已经失败
-        if(this.featureContext.isFastFail()){
-            if(status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)){
+        if (this.featureContext.isFastFail()) {
+            if (status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)) {
                 log.debug("Feature: {}， 快速失败.", featureBean.getName());
                 this.featureContext.getCountDownLatch().countDown();
 
