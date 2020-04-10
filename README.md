@@ -47,9 +47,9 @@ C（先计算C)	--> B，E（再同时计算B，E） --> A，D（最后同时计�
 ```
 @FeatureComponent
 public class Test {
-    //   				⬇️代表函数名称
+    //   		⬇️代表函数名称
     @Feature(name = "test5")
-    //							⬇️ 依赖的函数名称
+    //				⬇️ 依赖的函数名称
     public Double test5(Double test4){
         return test4 + 1.0;
     }
