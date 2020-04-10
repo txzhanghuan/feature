@@ -17,6 +17,10 @@
                     <source>8</source>
                     <target>8</target>
                     <encoding>UTF-8</encoding>
+                    <!--重要-->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -26,9 +30,9 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <!--                        <goals>-->
-                        <!--                            <goal>jar</goal>-->
-                        <!--                        </goals>-->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

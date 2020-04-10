@@ -20,13 +20,33 @@ C（先计算C)	--> B，E（再同时计算B，E） --> A，D（最后同时计�
 ## 用法
 
 >该引擎依赖JDK8，以及SpringBoot框架
+>
+> 需加入Maven编译参数
+
+      ```Java
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+        <source>8</source>
+        <target>8</target>
+        <encoding>UTF-8</encoding>
+        <!-- 重要 -->
+        <compilerArgs>
+        <arg>-parameters</arg>
+        </compilerArgs>
+        </configuration>
+      </plugin>
+      ```
+```
 
 通过标注@Feature的形式，将方法转化为一个函数（仍可以通过方法的形式调用）。
 下面代码表示test5依赖test4，test4无入参，可直接计算，当我只需要计算test5的时候，计算引擎会根据函数的依赖关系，生成一个DAG图：
 即：test5--依赖-->test4 
 那么开始计算的时候，计算引擎会先计算test4的值，再把test4的值放入test5的入参中让其计算。
 
-```Java
+​```Java
 @FeatureComponent
 public class Test {
 		//       					⬇️代表函数名称
