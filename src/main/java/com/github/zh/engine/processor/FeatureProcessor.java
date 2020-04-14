@@ -45,6 +45,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        FeatureComponent featureComponent = bean.getClass().getAnnotation(FeatureComponent.class);
         if (bean.getClass().getAnnotation(FeatureComponent.class) == null){
             return bean;
         }
@@ -73,6 +74,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 //构建FeatureBean
                 NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
                         .feature(featureObject)
+                        .featureComponent(featureComponent)
                         .name(feature.name())
                         .output(feature.output())
                         .parents(parents)
@@ -95,6 +97,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean).toString());
             } catch (Exception e) {
                 log.error("Generate feature error: {} ", feature.name(), e);
+                throw new Error("Context has same feature!", e);
             }
         });
 
