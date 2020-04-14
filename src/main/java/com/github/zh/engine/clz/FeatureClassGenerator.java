@@ -33,7 +33,7 @@ public class FeatureClassGenerator {
 
         String params = constructByParam(parameterTypes, parameters);
         String compileMethod = String.format(TEMPLATE_METHOD, catalogClassName, realMethodName, params);
-        String className = convert2CamelCase(featureMethodName);
+        String className = featureMethodName;
         CtClass clz = classPool.makeClass(className,
                 classPool.get(AbstractFeature.class.getName()));
         CtMethod ctMethod = CtNewMethod.make(compileMethod, clz);
@@ -78,19 +78,5 @@ public class FeatureClassGenerator {
             }
         }
         return paramsStr.toString();
-    }
-
-    public String convert2CamelCase(String str){
-        if(!str.matches("^[A-Za-z][A-Za-z0-9]*")){
-            throw new IllegalArgumentException("feature名字错啦～需遵守驼峰命名法哦");
-        }
-        //A-Z
-        if(str.charAt(0) >= 65 && str.charAt(0) <= 90){
-            return str;
-        }else if(str.charAt(0) >= 97 && str.charAt(0) <= 122){
-            return (char) (str.charAt(0) - 32) + str.substring(1);
-        } else{
-            throw new IllegalArgumentException("feature名字错啦～需遵守驼峰命名法哦");
-        }
     }
 }
