@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  * Time: 9:08 下午
  * Description:
  */
-@Component
 @Slf4j
 public class FeatureEngine implements InitializingBean {
 

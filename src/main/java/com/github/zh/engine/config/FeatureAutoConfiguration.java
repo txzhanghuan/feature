@@ -1,10 +1,12 @@
 package com.github.zh.engine.config;
 
 import com.github.zh.engine.FeatureEngine;
+import com.github.zh.engine.processor.FeatureProcessor;
 import com.github.zh.engine.properties.FeatureProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -19,4 +21,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(FeatureProperties.class)
 public class FeatureAutoConfiguration {
 
+    @Bean
+    public FeatureProcessor getFeatureProcessor() {
+        return new FeatureProcessor();
+    }
+
+    @Bean
+    public FeatureEngine featureEngine() {
+        return new FeatureEngine();
+    }
 }

@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
@@ -32,11 +31,9 @@ import java.util.stream.Collectors;
  * @created 2020/01/27
  */
 @Slf4j
-@Component
 public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent>{
 
-    @Autowired
-    FeatureClassGenerator featureClassGenerator;
+    private FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
     @Autowired(required = false)
     List<FeaturePostProcessor> featurePostProcessorList;

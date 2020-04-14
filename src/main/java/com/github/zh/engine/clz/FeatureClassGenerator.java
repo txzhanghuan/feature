@@ -1,7 +1,6 @@
 package com.github.zh.engine.clz;
 
 import javassist.*;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Parameter;
 
@@ -9,7 +8,6 @@ import java.lang.reflect.Parameter;
  * @author zhanghuan
  * @created 2020/01/27
  */
-@Component
 public class FeatureClassGenerator {
 
     private static final String TEMPLATE_METHOD = "public Object execute(Object[] args){\n"
