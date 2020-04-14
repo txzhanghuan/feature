@@ -44,7 +44,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         FeatureClass featureClass = bean.getClass().getAnnotation(FeatureClass.class);
-        if (bean.getClass().getAnnotation(FeatureClass.class) == null) {
+        if (featureClass == null) {
             return bean;
         }
         List<Method> featureMethods = Arrays.stream(bean.getClass().getMethods()).filter(it ->
