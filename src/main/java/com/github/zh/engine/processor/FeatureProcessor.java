@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @created 2020/01/27
  */
 @Slf4j
-public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent>{
+public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
     private FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
@@ -40,6 +40,11 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
 
     @Getter
     private ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {

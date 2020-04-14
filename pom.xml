@@ -68,6 +68,11 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j-api.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -75,7 +80,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <java.version>1.8</java.version>
-        <spring-boot.version>RELEASE</spring-boot.version>
+        <spring-boot.version>1.5.13.RELEASE</spring-boot.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <javassist.version>3.12.1.GA</javassist.version>
         <lombok.version>1.18.4</lombok.version>
