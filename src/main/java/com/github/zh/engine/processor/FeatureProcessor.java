@@ -1,7 +1,7 @@
 package com.github.zh.engine.processor;
 
 import com.github.zh.engine.annotation.Feature;
-import com.github.zh.engine.annotation.FeatureComponent;
+import com.github.zh.engine.annotation.FeatureClass;
 import com.github.zh.engine.clz.FeatureClassGenerator;
 import com.github.zh.engine.clz.IFeature;
 import com.github.zh.engine.co.AbstractFeatureBean;
@@ -43,8 +43,8 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        FeatureComponent featureComponent = bean.getClass().getAnnotation(FeatureComponent.class);
-        if (bean.getClass().getAnnotation(FeatureComponent.class) == null){
+        FeatureClass featureClass = bean.getClass().getAnnotation(FeatureClass.class);
+        if (bean.getClass().getAnnotation(FeatureClass.class) == null) {
             return bean;
         }
         List<Method> featureMethods = Arrays.stream(bean.getClass().getMethods()).filter(it ->
@@ -72,7 +72,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 //构建FeatureBean
                 NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
                         .feature(featureObject)
-                        .featureComponent(featureComponent)
+                        .featureClass(featureClass)
                         .name(feature.name())
                         .output(feature.output())
                         .parents(parents)

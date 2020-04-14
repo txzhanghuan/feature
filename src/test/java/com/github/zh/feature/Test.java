@@ -2,8 +2,9 @@ package com.github.zh.feature;
 
 
 import com.github.zh.engine.annotation.Feature;
-import com.github.zh.engine.annotation.FeatureComponent;
+import com.github.zh.engine.annotation.FeatureClass;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Smaple
@@ -11,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
  * @author zhanghuan
  * @created 2020/01/27
  */
-@FeatureComponent
+@FeatureClass
+@Component
 @Slf4j
 public class Test {
 
