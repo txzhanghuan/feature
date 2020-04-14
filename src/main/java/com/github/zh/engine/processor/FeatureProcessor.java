@@ -6,6 +6,7 @@ import com.github.zh.engine.clz.FeatureClassGenerator;
 import com.github.zh.engine.clz.IFeature;
 import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.bean.NativeFeatureBean;
+import com.github.zh.engine.exception.FeatureCreationException;
 import com.github.zh.engine.interfaces.FeaturePostProcessor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +98,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean).toString());
             } catch (Exception e) {
                 log.error("Generate feature error: {} ", feature.name(), e);
-                throw new Error("Context has same feature!", e);
+                throw new FeatureCreationException(e.getMessage(), e);
             }
         });
 

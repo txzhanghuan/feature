@@ -24,4 +24,9 @@ public class Test {
     public Integer test4() {
         return 1;
     }
+
+    @Feature(name = "test4", output = false)
+    public Integer test3() {
+        return 1;
+    }
 }
