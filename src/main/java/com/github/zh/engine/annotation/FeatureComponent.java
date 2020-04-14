@@ -15,5 +15,5 @@ import java.lang.annotation.*;
 @Inherited
 public @interface FeatureComponent {
 
-    String preName() default "";
+    String description() default "";
 }
