@@ -17,9 +17,10 @@ public class FeatureClassGenerator {
             "super(bean);\n" +
             "}";
 
-    private static ClassPool classPool = new ClassPool();
+    private static ClassPool classPool;
 
     static {
+        classPool = new ClassPool();
         classPool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
     }
 

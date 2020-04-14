@@ -1,7 +1,7 @@
 package com.github.zh.engine.co.bean;
 
 import com.github.zh.engine.annotation.Feature;
-import com.github.zh.engine.annotation.FeatureComponent;
+import com.github.zh.engine.annotation.FeatureClass;
 import com.github.zh.engine.clz.IFeature;
 import com.github.zh.engine.co.AbstractFeatureBean;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class NativeFeatureBean extends AbstractFeatureBean {
 
     private Feature featureMetaData;
 
-    private FeatureComponent featureComponent;
+    private FeatureClass featureClass;
 
     private IFeature feature;
 
@@ -32,12 +32,12 @@ public class NativeFeatureBean extends AbstractFeatureBean {
 
     @Builder
     public NativeFeatureBean(String name, boolean output, List<String> parents,
-                             List<String> children, Feature featureMetaData, FeatureComponent featureComponent, IFeature feature,
+                             List<String> children, Feature featureMetaData, FeatureClass featureClass, IFeature feature,
                              Class<?> returnType) {
         super(name, output, parents, children);
         this.featureMetaData = featureMetaData;
         this.feature = feature;
-        this.featureComponent = featureComponent;
+        this.featureClass = featureClass;
         this.returnType = returnType;
     }
 
