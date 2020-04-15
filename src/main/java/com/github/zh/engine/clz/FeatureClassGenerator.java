@@ -17,7 +17,7 @@ public class FeatureClassGenerator {
             "super(bean);\n" +
             "}";
 
-    private static ClassPool classPool;
+    private static final ClassPool classPool;
 
     static {
         classPool = new ClassPool();

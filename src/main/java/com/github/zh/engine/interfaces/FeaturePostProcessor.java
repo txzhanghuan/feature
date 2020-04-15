@@ -2,7 +2,6 @@ package com.github.zh.engine.interfaces;
 
 import com.github.zh.engine.co.AbstractFeatureBean;
 import org.springframework.beans.BeansException;
-import org.springframework.lang.Nullable;
 
 /**
  * @author 阿桓
@@ -12,7 +11,6 @@ import org.springframework.lang.Nullable;
  */
 public interface FeaturePostProcessor {
 
-    @Nullable
     default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(T featureBean, String featureBeanName) throws BeansException {
         return featureBean;
     }
