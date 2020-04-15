@@ -38,7 +38,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
     private final FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
     @Autowired(required = false)
-    List<FeaturePostProcessor> featurePostProcessorList;
+    private List<FeaturePostProcessor> featurePostProcessorList;
 
     @Getter
     private final ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
