@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class FeatureContext {
 
     @Getter
-    private ConcurrentHashMap<String, FeatureEntity> featureEntitiesPool = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FeatureEntity> featureEntitiesPool = new ConcurrentHashMap<>();
 
     @Getter
     private ThreadPoolExecutor pool;
