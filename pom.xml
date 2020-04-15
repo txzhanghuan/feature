@@ -27,14 +27,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -77,6 +69,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j-api.version}</version>
+            <scope>test</scope>
         </dependency>
 
 
@@ -88,9 +81,8 @@
 
         <java.version>1.8</java.version>
         <spring-boot.version>1.5.13.RELEASE</spring-boot.version>
-        <slf4j-api.version>1.7.30</slf4j-api.version>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
         <javassist.version>3.27.0-GA</javassist.version>
         <lombok.version>1.18.4</lombok.version>
-        <log4j-slf4j-impl.version>2.13.1</log4j-slf4j-impl.version>
     </properties>
 </project>
