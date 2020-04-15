@@ -73,6 +73,13 @@
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <properties>
@@ -84,5 +91,6 @@
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <javassist.version>3.27.0-GA</javassist.version>
         <lombok.version>1.18.4</lombok.version>
+        <log4j-slf4j-impl.version>2.13.1</log4j-slf4j-impl.version>
     </properties>
 </project>
