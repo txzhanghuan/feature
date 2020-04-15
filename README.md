@@ -21,22 +21,22 @@ C（先计算C)	--> B，E（再同时计算B，E） --> A，D（最后同时计�
 
 >该引擎依赖JDK8，以及SpringBoot框架
 >
-> 需加入Maven编译参数
+> 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目
 
 ```Java
 <plugin>
-<groupId>org.apache.maven.plugins</groupId>
-<artifactId>maven-compiler-plugin</artifactId>
-<version>3.1</version>
-<configuration>
-<source>8</source>
-<target>8</target>
-<encoding>UTF-8</encoding>
-<!-- 重要 -->
-<compilerArgs>
-<arg>-parameters</arg>
-</compilerArgs>
-</configuration>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-compiler-plugin</artifactId>
+  <version>3.1</version>
+  <configuration>
+    <source>8</source>
+    <target>8</target>
+    <encoding>UTF-8</encoding>
+    <!-- 重要 -->
+    <compilerArgs>
+    	<arg>-parameters</arg>
+    </compilerArgs>
+  </configuration>
 </plugin>
 ```
 
@@ -45,7 +45,8 @@ C（先计算C)	--> B，E（再同时计算B，E） --> A，D（最后同时计�
 即：test5--依赖-->test4 
 那么开始计算的时候，计算引擎会先计算test4的值，再把test4的值放入test5的入参中让其计算。
 ```
-@FeatureComponent
+@FeatureClass
+@Component
 public class Test {
     //   		⬇️代表函数名称
     @Feature(name = "test5")
@@ -63,17 +64,15 @@ public class Test {
 > @Feature
 > 标志这个方法是一个函数（方法务必是public），name属性为最后生成该函数的名字（可与方法名不同），入参的类型和参数必须已有的函数相同，不支持同名函数。
 
-> @FeatureComponent
-> 作用在类上，标明这个类中有函数需要计算，并且集合了Spring中的@Component注解
+> @FeatureClass
+> 作用在类上，标明这个类中有函数需要计算，需要配合Spring中的@Component注解
 
 ---
-
-通过Spring自动注入FeatureEngine
-> 若找不到对应的Bean的话，请在启动类上面加上该注解@ComponentScan(basePackages = {"com.github.zh"})
 
 入参 **originDataMap**原始数据 以及 **calcFeatures**待计算的函数名称。
 返回一个计算完成的函数Map。
 默认使用线程池进行并行计算（确保拓扑顺序），默认线程数为机器的核心数✖️2
+
 >可通过feature.featureThreadPoolSize以及feature.featureThreadPoolMaxSize更改。
 
 > 现版本无法解决循环依赖问题，需在编码时确保，加入在环中任意一个节点的原始数据即可打破循环。
@@ -172,4 +171,5 @@ public interface FeaturePostProcessor{
 }
 ```
 同Spring的 **BeanPostProcessor**
+
 
