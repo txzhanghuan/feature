@@ -16,13 +16,13 @@
 #### 拓扑顺序调用
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdww0zxudlj30ie096glx.jpg)
 
-**通过这个计算引擎，C只调用了1次，并且实现了计算并行化。**
+**通过这个计算引擎，外部API只调用了1次，并且实现了计算并行化。**
 
 ## 用法
 
 >该引擎依赖JDK8，以及SpringBoot框架
 >
-> 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目
+> 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目，参考设置JDK8获取方法参数的流程
 
 ```Java
 <plugin>
@@ -107,7 +107,7 @@ public class FeatureService {
     "test5": 2
   }
 ```
-## 进阶
+## 拓展
 
 #### 自定义计算Bean
 
