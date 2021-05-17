@@ -24,7 +24,7 @@
 >
 > 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目，参考设置JDK8获取方法参数的流程
 
-```Java
+```xml
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-compiler-plugin</artifactId>
