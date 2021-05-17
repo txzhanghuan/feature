@@ -37,7 +37,7 @@ public class FeatureContext {
     /**
      * 需要计算的变量数
      */
-    private int canCalcFeaturesCount = 0;
+    private int needCalcFeaturesCount = 0;
 
     /**
      * 执行变量计算
@@ -45,7 +45,7 @@ public class FeatureContext {
      * @throws InterruptedException
      */
     public void executeAll(long timeout, Map<String, String> logContext) throws InterruptedException {
-        if (canCalcFeaturesCount == 0) {
+        if (needCalcFeaturesCount == 0) {
             throw new CalculateException("无变量需计算");
         }
         featureEntitiesPool.values().forEach(
@@ -130,7 +130,7 @@ public class FeatureContext {
     }
 
     private void initCountDownLatch() {
-        this.countDownLatch = new CountDownLatch(canCalcFeaturesCount);
+        this.countDownLatch = new CountDownLatch(needCalcFeaturesCount);
     }
 
     /**
@@ -171,7 +171,7 @@ public class FeatureContext {
                     .build();
             if(!featureEntitiesPool.containsKey(key)){
                 featureEntitiesPool.put(key, featureEntity);
-                canCalcFeaturesCount++;
+                needCalcFeaturesCount++;
             }
         });
     }
@@ -195,22 +195,14 @@ public class FeatureContext {
                     .build();
             if(!featureEntitiesPool.containsKey(feature)){
                 featureEntitiesPool.put(feature, featureEntity);
-                canCalcFeaturesCount++;
+                needCalcFeaturesCount++;
             }
         });
     }
 
     private void putMiddleFeatureBean(Map<String, AbstractFeatureBean> featureBeanMap) {
         Queue<String> queue = new LinkedBlockingDeque<>();
-        featureEntitiesPool.values().stream().filter(
-                it -> !it.getFeatureEnum().equals(FeatureEnums.ORIGIN_DATA)
-        ).forEach(
-                it -> it.getParents().stream().filter(
-                        tempParent -> !featureEntitiesPool.containsKey(tempParent)
-                ).forEach(
-                        queue::offer
-                )
-        );
+        insertToQueue(queue);
         while(!queue.isEmpty()){
             String parent = queue.poll();
             if(!featureBeanMap.containsKey(parent) && !featureEntitiesPool.containsKey(parent)){
@@ -223,20 +215,24 @@ public class FeatureContext {
                     .featureEnum(FeatureEnums.NATIVE_FEATURE)
                     .featureBean(featureBeanMap.get(parent))
                     .build();
-            if(!featureEntitiesPool.containsKey(parent)){
+            if (!featureEntitiesPool.containsKey(parent)) {
                 featureEntitiesPool.put(parent, featureEntity);
-                canCalcFeaturesCount++;
+                needCalcFeaturesCount++;
             }
-            featureEntitiesPool.values().stream().filter(
-                    it -> !it.getFeatureEnum().equals(FeatureEnums.ORIGIN_DATA)
-            ).forEach(
-                    it -> it.getParents().stream().filter(
-                            tempParent -> !featureEntitiesPool.containsKey(tempParent)
-                    ).forEach(
-                            queue::offer
-                    )
-            );
+            insertToQueue(queue);
         }
+    }
+
+    private void insertToQueue(Queue<String> queue) {
+        featureEntitiesPool.values().stream().filter(
+                it -> !it.getFeatureEnum().equals(FeatureEnums.ORIGIN_DATA)
+        ).forEach(
+                it -> it.getParents().stream().filter(
+                        tempParent -> !featureEntitiesPool.containsKey(tempParent)
+                ).forEach(
+                        queue::offer
+                )
+        );
     }
 
     private void checkFail() {
@@ -252,7 +248,7 @@ public class FeatureContext {
 
     public Map<String, Object> getCalcResult(boolean debug) {
         checkFail();
-        Map<String, Object> resultMap = new HashMap<>(canCalcFeaturesCount);
+        Map<String, Object> resultMap = new HashMap<>(needCalcFeaturesCount);
         if (debug) {
             featureEntitiesPool.forEach((key, featureEntity) -> resultMap.put(key, featureEntity.getResult()));
         } else {

@@ -94,7 +94,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                     featureBeanMap.put(feature.name(), nativeFeatureBean);
                 }
 
-                log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean).toString());
+                log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean));
             } catch (Exception e) {
                 log.error("Generate feature error: {} ", feature.name(), e);
                 throw new FeatureCreationException(e.getMessage(), e);
