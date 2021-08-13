@@ -6,5 +6,11 @@ package com.github.zh.engine.clz;
  */
 public interface IFeature {
 
+    /**
+     * 执行接口
+     *
+     * @param args 入参
+     * @return 结果
+     */
     Object execute(Object[] args);
 }
