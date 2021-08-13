@@ -37,7 +37,7 @@ public class FeatureEngine implements InitializingBean {
     private ThreadPoolExecutor calcPool;
 
     @Autowired
-    FeatureProcessor featureProcessor;
+    private FeatureProcessor featureProcessor;
 
     /**
      * 计算变量（仅本地FeatureBean）
