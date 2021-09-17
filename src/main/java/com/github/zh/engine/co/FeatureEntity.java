@@ -44,7 +44,7 @@ public class FeatureEntity {
 
     private volatile String errorParent;
 
-    public void execute(Map<String,String> logContext){
+    public void execute(Map<String, String> logContext) {
 
         if (logContext != null) {
             MDC.setContextMap(logContext);
@@ -65,20 +65,20 @@ public class FeatureEntity {
                 MDC.clear();
                 //通知子节点快速失败
                 notifyChildren(logContext);
-                return ;
+                return;
             }
         }
 
         //检查参数是否都已计算完成
-        if(!checkParamsReady()){
+        if (!checkParamsReady()) {
             MDC.clear();
-            return ;
+            return;
         }
 
         //判断参数属否出错
         String errorParam = getParamError();
-        if(errorParam!=null){
-            if(status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)){
+        if (errorParam != null) {
+            if (status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)) {
                 this.errorParent = errorParam;
                 error = featureContext.getFeatureEntitiesPool().get(errorParam).getError();
                 log.error("Feature: {}， 计算失败。出错参数: {}, 错误根参数:{}", featureBean.getName(), errorParam, this.getFeatureContext().getRootErrorFeature(this));
@@ -89,7 +89,7 @@ public class FeatureEntity {
 
         //计算
         //初始化 -> 计算中
-        if(status.compareAndSet(FeatureStates.INIT, FeatureStates.PROCESSING)){
+        if (status.compareAndSet(FeatureStates.INIT, FeatureStates.PROCESSING)) {
             List<Object> args = new ArrayList<>();
             parents.forEach(
                     it -> {
@@ -101,7 +101,7 @@ public class FeatureEntity {
                 result = featureBean.execute(args.toArray());
                 status.set(FeatureStates.SUCCESS);
                 log.debug("线程：{}, feature: {}, 结果: {}. 执行完毕", Thread.currentThread().getName(), this.getFeatureBean().getName(), result);
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("Feature: {}， 计算失败。输入参数：{}", featureBean.getName(), args, e);
                 error = e;
                 status.set(FeatureStates.FAILED);
@@ -118,10 +118,10 @@ public class FeatureEntity {
 
     }
 
-    private void notifyChildren(Map<String,String> logContext) {
+    private void notifyChildren(Map<String, String> logContext) {
         children.forEach(
                 it -> {
-                    if(featureContext.getFeatureEntitiesPool().containsKey(it)) {
+                    if (featureContext.getFeatureEntitiesPool().containsKey(it)) {
                         FeatureEntity featureEntity = featureContext.getFeatureEntitiesPool().get(it);
                         CompletableFuture.runAsync(() -> featureEntity.execute(logContext), this.featureContext.getPool());
                     }
@@ -135,11 +135,11 @@ public class FeatureEntity {
         );
     }
 
-    private String getParamError(){
+    private String getParamError() {
         boolean isError = parents.stream().anyMatch(
                 it -> featureContext.getFeatureEntitiesPool().get(it).status.get().equals(FeatureStates.FAILED)
         );
-        if(isError){
+        if (isError) {
             return parents.stream().filter(
                     it -> featureContext.getFeatureEntitiesPool().get(it).status.get().equals(FeatureStates.FAILED)
             ).findFirst().get();

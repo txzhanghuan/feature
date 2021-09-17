@@ -1,4 +1,5 @@
 # feature
+
 函数计算引擎
 
 ## 概述
@@ -10,17 +11,20 @@
 这个引擎减少了一个集合中的函数重复接口调用和重复的函数调用的次数，并且通过一个非常轻量级的方式嵌入到项目中。
 
 #### 烟囱模式调用
+
 ![烟囱式调用](https://tva1.sinaimg.cn/large/007S8ZIlly1gdww13ipajj30fg07naa9.jpg)
 
 外部API调用了2次
+
 #### 拓扑顺序调用
+
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdww0zxudlj30ie096glx.jpg)
 
 **通过这个计算引擎，外部API只调用了1次，并且实现了计算并行化。**
 
 ## 用法
 
->该引擎依赖JDK8，以及SpringBoot框架
+> 该引擎依赖JDK8，以及SpringBoot框架
 >
 > 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目，参考设置JDK8获取方法参数的流程
 
@@ -41,10 +45,9 @@
 </plugin>
 ```
 
-通过标注@Feature的形式，将方法转化为一个函数（仍可以通过方法的形式调用）。
-下面代码表示test5依赖test4，test4无入参，可直接计算，当我只需要计算test5的时候，计算引擎会根据函数的依赖关系，生成一个DAG图：
-即：test5--依赖-->test4 
-那么开始计算的时候，计算引擎会先计算test4的值，再把test4的值放入test5的入参中让其计算。
+通过标注@Feature的形式，将方法转化为一个函数（仍可以通过方法的形式调用）。 下面代码表示test5依赖test4，test4无入参，可直接计算，当我只需要计算test5的时候，计算引擎会根据函数的依赖关系，生成一个DAG图：
+即：test5--依赖-->test4 那么开始计算的时候，计算引擎会先计算test4的值，再把test4的值放入test5的入参中让其计算。
+
 ```
 @FeatureClass
 @Component
@@ -62,6 +65,7 @@ public class Test {
     }
 }
 ```
+
 > @Feature
 > 标志这个方法是一个函数（方法务必是public），name属性为最后生成该函数的名字（可与方法名不同），入参的类型和参数必须已有的函数相同，不支持同名函数。
 
@@ -70,11 +74,9 @@ public class Test {
 
 ---
 
-入参 **originDataMap**原始数据 以及 **calcFeatures**待计算的函数名称。
-返回一个计算完成的函数Map。
-默认使用线程池进行并行计算（确保拓扑顺序），默认线程数为机器的核心数✖️2
+入参 **originDataMap**原始数据 以及 **calcFeatures**待计算的函数名称。 返回一个计算完成的函数Map。 默认使用线程池进行并行计算（确保拓扑顺序），默认线程数为机器的核心数✖️2
 
->可通过feature.featureThreadPoolSize以及feature.featureThreadPoolMaxSize更改。
+> 可通过feature.featureThreadPoolSize以及feature.featureThreadPoolMaxSize更改。
 
 > 现版本无法解决循环依赖问题，需在编码时确保，加入在环中任意一个节点的原始数据即可打破循环。
 
@@ -90,7 +92,9 @@ public class FeatureService {
     }
 }
 ```
+
 输入样例：
+
 ```json
 {
   "calcFeatures": [
@@ -100,18 +104,22 @@ public class FeatureService {
   }
 }
 ```
+
 输出样例：
+
 ```json
 {
     "test4": 1,
     "test5": 2
   }
 ```
+
 ## 拓展
 
 #### 自定义计算Bean
 
 通过继承AbstractFeatureBean来自定义计算的Bean。
+
 ```Java
 public abstract class AbstractFeatureBean implements IFeatureBean {
 
@@ -143,7 +151,9 @@ public class OuterFeatureBean extends AbstractFeatureBean {
     }
 }
 ```
+
 引擎计算加入外部Bean的方法
+
 ```Java
 @Service
 @Slf4j
@@ -171,6 +181,7 @@ public interface FeaturePostProcessor{
     }
 }
 ```
+
 同Spring的 **BeanPostProcessor**
 
 

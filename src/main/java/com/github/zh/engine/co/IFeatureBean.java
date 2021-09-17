@@ -11,6 +11,7 @@ public interface IFeatureBean {
 
     /**
      * 运算
+     *
      * @param args
      * @return
      */

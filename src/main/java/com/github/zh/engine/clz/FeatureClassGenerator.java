@@ -26,18 +26,18 @@ public class FeatureClassGenerator {
 
 
     public Class<?> generateClass(Class<?>[] parameterTypes, Parameter[] parameters,
-                                                   String catalogClassName, String featureComponentName,
-                                                   String featureMethodName, String realMethodName)
+                                  String catalogClassName, String featureComponentName,
+                                  String featureName, String realMethodName)
             throws NotFoundException, CannotCompileException {
 
         String params = constructByParam(parameterTypes, parameters);
         String compileMethod = String.format(TEMPLATE_METHOD, catalogClassName, realMethodName, params);
-        String className = featureMethodName;
+        String className = featureName;
         CtClass clz = classPool.makeClass(className,
                 classPool.get(AbstractFeature.class.getName()));
         CtMethod ctMethod = CtNewMethod.make(compileMethod, clz);
         clz.addMethod(ctMethod);
-        CtConstructor ctConstructor = CtNewConstructor.make(String.format(TEMPLATE_CONSTRUCT, featureMethodName), clz);
+        CtConstructor ctConstructor = CtNewConstructor.make(String.format(TEMPLATE_CONSTRUCT, featureName), clz);
         clz.addConstructor(ctConstructor);
         Class<?> klz = clz.toClass();
         clz.detach();
@@ -47,14 +47,14 @@ public class FeatureClassGenerator {
     private String constructByParam(Class<?>[] parameterTypes, Parameter[] parameters) throws CannotCompileException {
         int parameterTypesLength = parameterTypes.length;
         int parametersLength = parameters.length;
-        if(parameterTypesLength != parametersLength){
+        if (parameterTypesLength != parametersLength) {
             throw new CannotCompileException("参数类型个数和参数个数不匹配");
         }
         StringBuilder paramsStr = new StringBuilder();
         String template = "(%s)args[%s]";
-        for(int i = 0; i < parametersLength; i++){
+        for (int i = 0; i < parametersLength; i++) {
             paramsStr.append(String.format(template, parameterTypes[i].getName(), i));
-            if(i < parametersLength - 1) {
+            if (i < parametersLength - 1) {
                 paramsStr.append(",");
             }
         }
@@ -64,15 +64,15 @@ public class FeatureClassGenerator {
     private String constructByMethodParam(Class<?>[] parameterTypes, Parameter[] parameters) throws CannotCompileException {
         int parameterTypesLength = parameterTypes.length;
         int parametersLength = parameters.length;
-        if(parameterTypesLength != parametersLength){
+        if (parameterTypesLength != parametersLength) {
             throw new CannotCompileException("参数类型个数和参数个数不匹配");
         }
         StringBuilder paramsStr = new StringBuilder();
-        for(int i = 0; i < parameterTypesLength; i++){
+        for (int i = 0; i < parameterTypesLength; i++) {
             paramsStr.append(parameterTypes[i].getName());
             paramsStr.append(" ");
             paramsStr.append(parameters[i].getName());
-            if(i < parameterTypesLength - 1) {
+            if (i < parameterTypesLength - 1) {
                 paramsStr.append(", ");
             }
         }

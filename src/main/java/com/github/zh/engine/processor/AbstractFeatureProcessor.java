@@ -1,8 +1,13 @@
 package com.github.zh.engine.processor;
 
 import com.github.zh.engine.co.AbstractFeatureBean;
+import com.github.zh.engine.interfaces.FeatureBeanPostProcessor;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -10,12 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0
  * @date 2021/9/17 14:48
  */
-public abstract class AbstractFeatureProcessor {
+@Component
+public abstract class AbstractFeatureProcessor<T extends AbstractFeatureBean> {
 
     @Getter
     private final static ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
+    @Autowired(required = false)
+    private List<FeatureBeanPostProcessor<T>> featureBeanPostProcessors;
 
-    protected void constructFeatureBeanChildren() {
+    protected void fillFeatureBeanChildren() {
         featureBeanMap.values().forEach(
                 featureBean -> {
                     featureBean.getParents().forEach(
@@ -28,4 +36,22 @@ public abstract class AbstractFeatureProcessor {
                 }
         );
     }
+
+    protected void put(String featureName, AbstractFeatureBean featureBean) {
+        featureBeanMap.put(featureName, featureBean);
+    }
+
+    protected T doFeatureBeanPostProcessor(T abstractFeatureBean) {
+        if (!CollectionUtils.isEmpty(featureBeanPostProcessors)) {
+            for (FeatureBeanPostProcessor<T> featureBeanPostProcessor : featureBeanPostProcessors) {
+                abstractFeatureBean = featureBeanPostProcessor.postProcessAfterInitializationFeature(abstractFeatureBean);
+            }
+        }
+        return abstractFeatureBean;
+    }
+
+//    protected Class<T> getTClass() {
+//        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+//        return tClass;
+//    }
 }

@@ -27,11 +27,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class FeatureEngine implements InitializingBean {
 
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     @Autowired
     private FeatureProperties featureProperties;
-
-    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-
     private int index = 0;
 
     private ThreadPoolExecutor calcPool;
