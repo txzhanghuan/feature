@@ -9,9 +9,9 @@ import org.springframework.beans.BeansException;
  * Time: 1:07 下午
  * Description:
  */
-public interface FeaturePostProcessor {
+public interface FeatureBeanPostProcessor<T extends AbstractFeatureBean> {
 
-    default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(T featureBean, String featureBeanName) throws BeansException {
+    default T postProcessAfterInitializationFeature(T featureBean) throws BeansException {
         return featureBean;
     }
 }

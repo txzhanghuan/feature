@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 阿桓
@@ -30,15 +31,18 @@ public class NativeFeatureBean extends AbstractFeatureBean {
 
     private Class<?> returnType;
 
+    private Map<String, String> properties;
+
     @Builder
     public NativeFeatureBean(String name, boolean output, List<String> parents,
                              List<String> children, Feature featureMetaData, FeatureClass featureClass, IFeature feature,
-                             Class<?> returnType) {
+                             Class<?> returnType, Map<String, String> properties) {
         super(name, output, parents, children);
         this.featureMetaData = featureMetaData;
         this.feature = feature;
         this.featureClass = featureClass;
         this.returnType = returnType;
+        this.properties = properties;
     }
 
     @Override

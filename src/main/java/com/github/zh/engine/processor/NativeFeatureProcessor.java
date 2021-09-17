@@ -2,13 +2,12 @@ package com.github.zh.engine.processor;
 
 import com.github.zh.engine.annotation.Feature;
 import com.github.zh.engine.annotation.FeatureClass;
+import com.github.zh.engine.annotation.properties.Property;
 import com.github.zh.engine.clz.FeatureClassGenerator;
 import com.github.zh.engine.clz.IFeature;
-import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.bean.NativeFeatureBean;
 import com.github.zh.engine.exception.FeatureCreationException;
-import com.github.zh.engine.interfaces.FeaturePostProcessor;
-import lombok.Getter;
+import com.github.zh.engine.interfaces.FeatureBeanPostProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,15 +28,12 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent>{
+public class NativeFeatureProcessor extends AbstractFeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
     private final FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
     @Autowired(required = false)
-    private List<FeaturePostProcessor> featurePostProcessorList;
-
-    @Getter
-    private final ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
+    private List<FeatureBeanPostProcessor<NativeFeatureBean>> featureBeanPostProcessors;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -55,6 +47,7 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
         featureMethods.forEach(it -> {
             Feature feature = it.getDeclaredAnnotation(Feature.class);
 
+            String name = "".equals(feature.name()) ? it.getName() : feature.name();
             String catalogClassName = bean.getClass().getName();
             try {
 
@@ -64,39 +57,45 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
                 Class<?> klz = featureClassGenerator.generateClass(
                         parameterTypes, parameters,
                         catalogClassName, beanName,
-                        feature.name(), it.getName());
+                        name, it.getName());
                 //实例化
                 IFeature featureObject = (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
 
                 //初始化父节点
                 List<String> parents = Arrays.stream(it.getParameters()).map(Parameter::getName).collect(Collectors.toList());
 
+                //获取NativeBean的Properties
+                Map<String, String> properties = Arrays.stream(it.getDeclaredAnnotationsByType(Property.class)).collect(
+                        Collectors.toMap(Property::key, Property::value)
+                );
+
                 //构建FeatureBean
                 NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
                         .feature(featureObject)
                         .featureClass(featureClass)
-                        .name(feature.name())
+                        .name(name)
                         .output(feature.output())
                         .parents(parents)
                         .children(new ArrayList<>())
                         .featureMetaData(feature)
                         .returnType(it.getReturnType())
+                        .properties(properties)
                         .build();
 
                 //寻找Feature后处理器
-                if(!CollectionUtils.isEmpty(featurePostProcessorList)) {
-                    for (FeaturePostProcessor featurePostProcessor : featurePostProcessorList) {
-                        nativeFeatureBean = featurePostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean, feature.name());
+                if (!CollectionUtils.isEmpty(featureBeanPostProcessors)) {
+                    for (FeatureBeanPostProcessor<NativeFeatureBean> featureBeanPostProcessor : featureBeanPostProcessors) {
+                        nativeFeatureBean = featureBeanPostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean);
                     }
                 }
 
-                if(nativeFeatureBean != null) {
-                    featureBeanMap.put(feature.name(), nativeFeatureBean);
+                if (nativeFeatureBean != null) {
+                    AbstractFeatureProcessor.getFeatureBeanMap().put(name, nativeFeatureBean);
                 }
 
                 log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean));
             } catch (Exception e) {
-                log.error("Generate feature error: {} ", feature.name(), e);
+                log.error("Generate feature error: {} ", name, e);
                 throw new FeatureCreationException(e.getMessage(), e);
             }
         });
@@ -104,22 +103,8 @@ public class FeatureProcessor implements BeanPostProcessor, ApplicationListener<
         return bean;
     }
 
-    private void constructFeatureBeanChildren(ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap) {
-        featureBeanMap.values().forEach(
-                featureBean -> {
-                    featureBean.getParents().forEach(
-                            parent -> {
-                                if(featureBeanMap.containsKey(parent)) {
-                                    featureBeanMap.get(parent).getChildren().add(featureBean.getName());
-                                }
-                            }
-                    );
-                }
-        );
-    }
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        constructFeatureBeanChildren(featureBeanMap);
+        super.constructFeatureBeanChildren();
     }
 }

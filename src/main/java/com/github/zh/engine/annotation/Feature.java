@@ -12,18 +12,11 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Feature {
     /**
-     * 生成的类名，首字母变成大写
+     * 生成的类名
      *
      * @return
      */
-    String name();
-
-    /**
-     * 变量的描述
-     *
-     * @return
-     */
-    String description() default "";
+    String name() default "";
 
     /**
      * 结果是否输出
