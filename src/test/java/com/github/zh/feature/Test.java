@@ -15,7 +15,7 @@ import java.util.Map;
  * Smaple
  *
  * @author zhanghuan
- * @created 2020/01/27
+ * @date 2020/01/27
  */
 @FeatureClass
 @Component
@@ -34,6 +34,7 @@ public class Test {
     }
 
     @Property(key = "a", value = "b")
+    @Property(key = "b", value = "b")
     @Feature(output = false)
     public Integer testB(Integer testA) throws InterruptedException {
         int result = testA + 1;
@@ -64,7 +65,7 @@ public class Test {
 
         Map<String, Integer> result = new HashMap<>();
         result.put("testD", testD);
-        System.out.println("testE = " + result.toString());
+        System.out.println("testE = " + result);
         return result;
     }
 
