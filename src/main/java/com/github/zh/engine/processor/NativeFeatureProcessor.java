@@ -29,9 +29,6 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
 
     private final FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
-//    @Autowired(required = false)
-//    private List<FeatureBeanPostProcessor<NativeFeatureBean>> featureBeanPostProcessors;
-
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         FeatureClass featureClass = bean.getClass().getAnnotation(FeatureClass.class);

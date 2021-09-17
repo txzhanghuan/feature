@@ -28,7 +28,6 @@ public class MainTest {
     @Test
     public void testCalc() {
         Map<String, Object> result = featureEngine.calc(null, new HashSet<>(Arrays.asList("testF")));
-//        Assert.assertEquals(2, result.get("test5"));
         System.out.println(result.toString());
     }
 }

@@ -16,7 +16,6 @@ public class SignUpFeatureBeanPostProcessor implements FeatureBeanPostProcessor<
     @Override
     public OuterFeatureBean postProcessAfterInitializationFeature(OuterFeatureBean featureBean) throws BeansException {
         System.out.println(featureBean.getName());
-//        System.out.println(featureBean.getProperties().get("a"));
         return featureBean;
     }
 }

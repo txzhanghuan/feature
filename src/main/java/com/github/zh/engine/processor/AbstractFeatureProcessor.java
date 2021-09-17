@@ -50,8 +50,4 @@ public abstract class AbstractFeatureProcessor<T extends AbstractFeatureBean> {
         return abstractFeatureBean;
     }
 
-//    protected Class<T> getTClass() {
-//        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-//        return tClass;
-//    }
 }
