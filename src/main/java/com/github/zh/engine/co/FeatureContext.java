@@ -204,19 +204,19 @@ public class FeatureContext {
         Queue<String> queue = new LinkedBlockingDeque<>();
         insertToQueue(queue);
         while(!queue.isEmpty()){
-            String parent = queue.poll();
-            if(!featureBeanMap.containsKey(parent) && !featureEntitiesPool.containsKey(parent)){
-                throw new CalculateException(String.format("缺少Feature或者输入参数: %s", parent));
+            String currentEntityKey = queue.poll();
+            if (!featureBeanMap.containsKey(currentEntityKey) && !featureEntitiesPool.containsKey(currentEntityKey)) {
+                throw new CalculateException(String.format("缺少Feature或者输入参数: %s", currentEntityKey));
             }
             FeatureEntity featureEntity = FeatureEntity.builder()
                     .featureContext(this)
-                    .parents(new ArrayList<>(featureBeanMap.get(parent).parents))
-                    .children(new ArrayList<>(featureBeanMap.get(parent).children))
+                    .parents(new ArrayList<>(featureBeanMap.get(currentEntityKey).parents))
+                    .children(new ArrayList<>(featureBeanMap.get(currentEntityKey).children))
                     .featureEnum(FeatureEnums.NATIVE_FEATURE)
-                    .featureBean(featureBeanMap.get(parent))
+                    .featureBean(featureBeanMap.get(currentEntityKey))
                     .build();
-            if (!featureEntitiesPool.containsKey(parent)) {
-                featureEntitiesPool.put(parent, featureEntity);
+            if (!featureEntitiesPool.containsKey(currentEntityKey)) {
+                featureEntitiesPool.put(currentEntityKey, featureEntity);
                 needCalcFeaturesCount++;
             }
             insertToQueue(queue);

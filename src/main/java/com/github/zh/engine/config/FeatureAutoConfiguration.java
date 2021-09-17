@@ -1,7 +1,7 @@
 package com.github.zh.engine.config;
 
 import com.github.zh.engine.FeatureEngine;
-import com.github.zh.engine.processor.FeatureProcessor;
+import com.github.zh.engine.processor.NativeFeatureProcessor;
 import com.github.zh.engine.properties.FeatureProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,14 +18,14 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(name = "enabled.featureEngine", matchIfMissing = true)
-@ConditionalOnClass({FeatureEngine.class, FeatureProcessor.class})
+@ConditionalOnClass({FeatureEngine.class, NativeFeatureProcessor.class})
 @EnableConfigurationProperties(FeatureProperties.class)
 public class FeatureAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(FeatureProcessor.class)
-    public FeatureProcessor getFeatureProcessor() {
-        return new FeatureProcessor();
+    @ConditionalOnMissingBean(NativeFeatureProcessor.class)
+    public NativeFeatureProcessor getFeatureProcessor() {
+        return new NativeFeatureProcessor();
     }
 
     @Bean

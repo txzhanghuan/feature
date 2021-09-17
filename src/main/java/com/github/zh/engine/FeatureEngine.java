@@ -2,7 +2,7 @@ package com.github.zh.engine;
 
 import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.FeatureContext;
-import com.github.zh.engine.processor.FeatureProcessor;
+import com.github.zh.engine.processor.NativeFeatureProcessor;
 import com.github.zh.engine.properties.FeatureProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -37,7 +37,7 @@ public class FeatureEngine implements InitializingBean {
     private ThreadPoolExecutor calcPool;
 
     @Autowired
-    private FeatureProcessor featureProcessor;
+    private NativeFeatureProcessor nativeFeatureProcessor;
 
     /**
      * 计算变量（仅本地FeatureBean）
@@ -86,7 +86,7 @@ public class FeatureEngine implements InitializingBean {
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
-        featureContext.init(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap());
+        featureContext.init(calcPool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap());
         try {
             featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {
@@ -151,7 +151,7 @@ public class FeatureEngine implements InitializingBean {
                                                         long timeout, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
-        featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, featureProcessor.getFeatureBeanMap(), outerFeatureBean);
+        featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap(), outerFeatureBean);
         try {
             featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {
