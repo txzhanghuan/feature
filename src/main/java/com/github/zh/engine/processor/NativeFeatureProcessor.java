@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author zhanghuan
- * @created 2020/01/27
+ * @date 2020/01/27
  */
 @Slf4j
 @Component
@@ -87,7 +87,7 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
         );
 
         //构建FeatureBean
-        NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
+        return NativeFeatureBean.builder()
                 .feature(featureObject)
                 .featureClass(featureClass)
                 .name(featureName)
@@ -98,7 +98,6 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
                 .returnType(it.getReturnType())
                 .properties(properties)
                 .build();
-        return nativeFeatureBean;
     }
 
     /**
@@ -121,8 +120,7 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
                 catalogClassName, beanName,
                 name, it.getName());
         //实例化
-        IFeature featureObject = (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
-        return featureObject;
+        return (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
     }
 
     @Override

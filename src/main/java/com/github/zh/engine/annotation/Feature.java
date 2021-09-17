@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * @author zhanghuan
- * @created 2020/01/27
+ * @date 2020/01/27
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,14 +14,14 @@ public @interface Feature {
     /**
      * 生成的类名
      *
-     * @return
+     * @return 特征名称
      */
     String name() default "";
 
     /**
      * 结果是否输出
      *
-     * @return
+     * @return true/false
      */
     boolean output() default true;
 }

@@ -2,7 +2,7 @@ package com.github.zh.engine.clz;
 
 /**
  * @author zhanghuan
- * @created 2020/01/29
+ * @date 2020/01/29
  */
 public abstract class AbstractFeature implements IFeature {
 
