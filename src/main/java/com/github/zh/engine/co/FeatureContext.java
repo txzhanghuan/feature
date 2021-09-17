@@ -41,6 +41,7 @@ public class FeatureContext {
 
     /**
      * 执行变量计算
+     *
      * @param logContext 日志上下文
      * @throws InterruptedException
      */
@@ -53,19 +54,20 @@ public class FeatureContext {
                         () -> featureEntity.execute(logContext)
                         , pool)
         );
-        if(!this.countDownLatch.await(timeout, TimeUnit.MILLISECONDS)){
+        if (!this.countDownLatch.await(timeout, TimeUnit.MILLISECONDS)) {
             throw new CalculateException("计算超时");
         }
     }
 
     /**
      * 初始化计算上下文（本地计算）
+     *
      * @param pool
      * @param originDataMap
      * @param calcFeatures
      * @param featureBeanMap
      */
-    public void init(ThreadPoolExecutor pool, Map<String, Object> originDataMap, Set<String> calcFeatures, Map<String, AbstractFeatureBean> featureBeanMap){
+    public void init(ThreadPoolExecutor pool, Map<String, Object> originDataMap, Set<String> calcFeatures, Map<String, AbstractFeatureBean> featureBeanMap) {
 
         //指定计算线程池
         this.pool = pool;
@@ -85,6 +87,7 @@ public class FeatureContext {
 
     /**
      * 初始化计算上下文（带入外部计算FeatureBean）
+     *
      * @param pool
      * @param originDataMap
      * @param calcFeatures
@@ -92,7 +95,7 @@ public class FeatureContext {
      */
     public void initWithOuterFeatureBean(ThreadPoolExecutor pool, Map<String, Object> originDataMap, Set<String> calcFeatures,
                                          Map<String, AbstractFeatureBean> featureBeanMap,
-                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap){
+                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
 
         //指定计算线程池
         this.pool = pool;
@@ -158,6 +161,7 @@ public class FeatureContext {
 
     /**
      * 注入外部所需计算的FeatureBean
+     *
      * @param outerFeatureBeanMap
      */
     private void initOuterFeatureBean(Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
@@ -169,7 +173,7 @@ public class FeatureContext {
                     .featureEnum(FeatureEnums.OUTER_FEATURE)
                     .featureBean(value)
                     .build();
-            if(!featureEntitiesPool.containsKey(key)){
+            if (!featureEntitiesPool.containsKey(key)) {
                 featureEntitiesPool.put(key, featureEntity);
                 needCalcFeaturesCount++;
             }
@@ -178,6 +182,7 @@ public class FeatureContext {
 
     /**
      * 注入需要计算的NativeFeatureBean
+     *
      * @param calcFeatures
      * @param featureBeanMap
      */
@@ -193,7 +198,7 @@ public class FeatureContext {
                     .featureEnum(FeatureEnums.NATIVE_FEATURE)
                     .featureBean(featureBeanMap.get(feature))
                     .build();
-            if(!featureEntitiesPool.containsKey(feature)){
+            if (!featureEntitiesPool.containsKey(feature)) {
                 featureEntitiesPool.put(feature, featureEntity);
                 needCalcFeaturesCount++;
             }
@@ -203,7 +208,7 @@ public class FeatureContext {
     private void putMiddleFeatureBean(Map<String, AbstractFeatureBean> featureBeanMap) {
         Queue<String> queue = new LinkedBlockingDeque<>();
         insertToQueue(queue);
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             String currentEntityKey = queue.poll();
             if (!featureBeanMap.containsKey(currentEntityKey) && !featureEntitiesPool.containsKey(currentEntityKey)) {
                 throw new CalculateException(String.format("缺少Feature或者输入参数: %s", currentEntityKey));

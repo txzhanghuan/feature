@@ -14,4 +14,9 @@ public interface FeatureBeanPostProcessor<T extends AbstractFeatureBean> {
     default T postProcessAfterInitializationFeature(T featureBean) throws BeansException {
         return featureBean;
     }
+
+//    default Class<T> getTClass() {
+//        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+//        return tClass;
+//    }
 }

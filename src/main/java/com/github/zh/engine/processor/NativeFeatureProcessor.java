@@ -7,15 +7,12 @@ import com.github.zh.engine.clz.FeatureClassGenerator;
 import com.github.zh.engine.clz.IFeature;
 import com.github.zh.engine.co.bean.NativeFeatureBean;
 import com.github.zh.engine.exception.FeatureCreationException;
-import com.github.zh.engine.interfaces.FeatureBeanPostProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -28,12 +25,12 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class NativeFeatureProcessor extends AbstractFeatureProcessor implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
+public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatureBean> implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
     private final FeatureClassGenerator featureClassGenerator = new FeatureClassGenerator();
 
-    @Autowired(required = false)
-    private List<FeatureBeanPostProcessor<NativeFeatureBean>> featureBeanPostProcessors;
+//    @Autowired(required = false)
+//    private List<FeatureBeanPostProcessor<NativeFeatureBean>> featureBeanPostProcessors;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -47,55 +44,23 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor implements 
         featureMethods.forEach(it -> {
             Feature feature = it.getDeclaredAnnotation(Feature.class);
 
-            String name = "".equals(feature.name()) ? it.getName() : feature.name();
-            String catalogClassName = bean.getClass().getName();
+            String featureName = "".equals(feature.name()) ? it.getName() : feature.name();
+
             try {
+                //生成FeatureBean的执行实例
+                IFeature featureObject = getFeature(bean, beanName, it, featureName);
 
-                Class<?>[] parameterTypes = it.getParameterTypes();
-                Parameter[] parameters = it.getParameters();
-                //生产Class
-                Class<?> klz = featureClassGenerator.generateClass(
-                        parameterTypes, parameters,
-                        catalogClassName, beanName,
-                        name, it.getName());
-                //实例化
-                IFeature featureObject = (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
+                //生成NativeFeatureBean
+                NativeFeatureBean nativeFeatureBean = constructNativeFeatureBean(featureClass, it, featureName, featureObject);
 
-                //初始化父节点
-                List<String> parents = Arrays.stream(it.getParameters()).map(Parameter::getName).collect(Collectors.toList());
+                //执行FeatureBeanPostProcessor后置处理器
+                nativeFeatureBean = super.doFeatureBeanPostProcessor(nativeFeatureBean);
 
-                //获取NativeBean的Properties
-                Map<String, String> properties = Arrays.stream(it.getDeclaredAnnotationsByType(Property.class)).collect(
-                        Collectors.toMap(Property::key, Property::value)
-                );
-
-                //构建FeatureBean
-                NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
-                        .feature(featureObject)
-                        .featureClass(featureClass)
-                        .name(name)
-                        .output(feature.output())
-                        .parents(parents)
-                        .children(new ArrayList<>())
-                        .featureMetaData(feature)
-                        .returnType(it.getReturnType())
-                        .properties(properties)
-                        .build();
-
-                //寻找Feature后处理器
-                if (!CollectionUtils.isEmpty(featureBeanPostProcessors)) {
-                    for (FeatureBeanPostProcessor<NativeFeatureBean> featureBeanPostProcessor : featureBeanPostProcessors) {
-                        nativeFeatureBean = featureBeanPostProcessor.postProcessAfterInitializationFeature(nativeFeatureBean);
-                    }
-                }
-
-                if (nativeFeatureBean != null) {
-                    AbstractFeatureProcessor.getFeatureBeanMap().put(name, nativeFeatureBean);
-                }
+                super.put(featureName, nativeFeatureBean);
 
                 log.info("Feature bean construct success : {}", Objects.requireNonNull(nativeFeatureBean));
             } catch (Exception e) {
-                log.error("Generate feature error: {} ", name, e);
+                log.error("Generate feature error: {} ", featureName, e);
                 throw new FeatureCreationException(e.getMessage(), e);
             }
         });
@@ -103,8 +68,68 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor implements 
         return bean;
     }
 
+    /**
+     * 构建填充NativeFeatureBean属性
+     *
+     * @param featureClass
+     * @param it
+     * @param featureName
+     * @param featureObject
+     * @return
+     */
+    private NativeFeatureBean constructNativeFeatureBean(FeatureClass featureClass, Method it, String featureName, IFeature featureObject) {
+
+        Feature feature = it.getDeclaredAnnotation(Feature.class);
+
+        //初始化父节点
+        List<String> parents = Arrays.stream(it.getParameters()).map(Parameter::getName).collect(Collectors.toList());
+
+        //获取NativeBean的Properties
+        Map<String, String> properties = Arrays.stream(it.getDeclaredAnnotationsByType(Property.class)).collect(
+                Collectors.toMap(Property::key, Property::value)
+        );
+
+        //构建FeatureBean
+        NativeFeatureBean nativeFeatureBean = NativeFeatureBean.builder()
+                .feature(featureObject)
+                .featureClass(featureClass)
+                .name(featureName)
+                .output(feature.output())
+                .parents(parents)
+                .children(new ArrayList<>())
+                .featureMetaData(feature)
+                .returnType(it.getReturnType())
+                .properties(properties)
+                .build();
+        return nativeFeatureBean;
+    }
+
+    /**
+     * 生成FeatureBean的执行实例
+     *
+     * @param bean
+     * @param beanName
+     * @param it
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    private IFeature getFeature(Object bean, String beanName, Method it, String name) throws Exception {
+        String catalogClassName = bean.getClass().getName();
+        Class<?>[] parameterTypes = it.getParameterTypes();
+        Parameter[] parameters = it.getParameters();
+        //生产Class
+        Class<?> klz = featureClassGenerator.generateClass(
+                parameterTypes, parameters,
+                catalogClassName, beanName,
+                name, it.getName());
+        //实例化
+        IFeature featureObject = (IFeature) klz.getDeclaredConstructors()[0].newInstance(bean);
+        return featureObject;
+    }
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        super.constructFeatureBeanChildren();
+        super.fillFeatureBeanChildren();
     }
 }

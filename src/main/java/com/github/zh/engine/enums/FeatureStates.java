@@ -25,7 +25,7 @@ public enum FeatureStates {
      */
     FAILED;
 
-    public boolean isEndStates(){
+    public boolean isEndStates() {
         return this.equals(FAILED) || this.equals(SUCCESS);
     }
 
