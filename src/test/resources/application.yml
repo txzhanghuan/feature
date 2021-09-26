@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: debug
+com:
+  github:
+    zh:
+      engine:
+        feature:
+          featureThreadPoolSize: 2

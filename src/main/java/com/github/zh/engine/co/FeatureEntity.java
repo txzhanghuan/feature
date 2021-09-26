@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class FeatureEntity {
         //检查Context是否已经失败
         if (this.featureContext.isFastFail()) {
             if (status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)) {
-                log.debug("Feature: {}， 快速失败.", featureBean.getName());
+                log.debug("Feature: {}， fast failed.", featureBean.getName());
                 this.featureContext.getCountDownLatch().countDown();
 
                 MDC.clear();
@@ -81,7 +82,7 @@ public class FeatureEntity {
             if (status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)) {
                 this.errorParent = errorParam;
                 error = featureContext.getFeatureEntitiesPool().get(errorParam).getError();
-                log.error("Feature: {}， 计算失败。出错参数: {}, 错误根参数:{}", featureBean.getName(), errorParam, this.getFeatureContext().getRootErrorFeature(this));
+                log.error("Feature: {}, calculate failed. Error param is: {}, the root error param is:{}", featureBean.getName(), errorParam, this.getFeatureContext().getRootErrorFeature(this));
                 this.featureContext.setFastFail(true);
                 this.featureContext.getCountDownLatch().countDown();
             }
@@ -98,11 +99,14 @@ public class FeatureEntity {
                     }
             );
             try {
+                StopWatch stopWatch = new StopWatch(featureBean.getName());
+                stopWatch.start();
                 result = featureBean.execute(args.toArray());
+                stopWatch.stop();
                 status.set(FeatureStates.SUCCESS);
-                log.debug("线程：{}, feature: {}, 结果: {}. 执行完毕", Thread.currentThread().getName(), this.getFeatureBean().getName(), result);
+                log.debug("Thread：{}, feature: {}, result: {}. complete, cost(ms)：{}", Thread.currentThread().getName(), this.getFeatureBean().getName(), result, stopWatch.getTotalTimeMillis());
             } catch (Exception e) {
-                log.error("Feature: {}， 计算失败。输入参数：{}", featureBean.getName(), args, e);
+                log.error("Feature: {}, failed. input param：{}", featureBean.getName(), args, e);
                 error = e;
                 status.set(FeatureStates.FAILED);
                 this.featureContext.setFastFail(true);

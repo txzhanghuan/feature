@@ -246,7 +246,7 @@ public class FeatureContext {
                     it -> it.getStatus().get().equals(FeatureStates.FAILED)
                             && it.getError() != null).findFirst().get();
             String errorFeature = getRootErrorFeature(featureEntity);
-            log.error("计算失败，失败根结点变量:{}", errorFeature, featureEntitiesPool.get(errorFeature).getError());
+            log.error("Calculate failed! The root failed feature is {}", errorFeature, featureEntitiesPool.get(errorFeature).getError());
             throw new CalculateException(featureEntitiesPool.get(errorFeature).getError());
         }
     }
