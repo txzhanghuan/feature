@@ -29,7 +29,7 @@ public class Test {
     public Integer testA() {
         int result = 5;
         System.out.println(otherBean.getTest());
-        System.out.println("testA = " + result);
+//        System.out.println("testA = " + result);
         return result;
     }
 
@@ -38,25 +38,20 @@ public class Test {
     @Feature(output = false)
     public Integer testB(Integer testA) throws InterruptedException {
         int result = testA + 1;
-        System.out.println("testB sleep start time: " + System.currentTimeMillis());
         Thread.sleep(3000);
-        System.out.println("testB sleep stop time: " + System.currentTimeMillis());
         return result;
     }
 
     @Feature(output = false)
     public Integer testC(Integer testA) throws InterruptedException {
         int result = testA + 1;
-        System.out.println("testC sleep start time: " + System.currentTimeMillis());
         Thread.sleep(4000);
-        System.out.println("testC sleep stop time: " + System.currentTimeMillis());
         return result;
     }
 
     @Feature
     public Integer testD(Integer testB, Integer testC) {
         int result = testB + testC;
-        System.out.println("testD = " + result);
         return result;
     }
 
@@ -65,14 +60,11 @@ public class Test {
 
         Map<String, Integer> result = new HashMap<>();
         result.put("testD", testD);
-        System.out.println("testE = " + result);
         return result;
     }
 
     @Feature
     public Integer testF(Map<String, Integer> testE) {
-
-        System.out.println(testE.get("testD"));
         return 1;
     }
 }

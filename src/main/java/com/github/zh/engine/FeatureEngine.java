@@ -4,6 +4,7 @@ import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.FeatureContext;
 import com.github.zh.engine.processor.NativeFeatureProcessor;
 import com.github.zh.engine.properties.FeatureProperties;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
@@ -32,6 +33,7 @@ public class FeatureEngine implements InitializingBean {
     private FeatureProperties featureProperties;
     private int index = 0;
 
+    @Setter
     private ThreadPoolExecutor calcPool;
 
     @Autowired
@@ -160,8 +162,10 @@ public class FeatureEngine implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        calcPool = new ThreadPoolExecutor(featureProperties.getFeatureThreadPoolSize(), featureProperties.getFeatureThreadPoolMaxSize(), 0,
-                TimeUnit.SECONDS, queue, r -> new Thread(r, "feature-pool-" + index++)
-        );
+        if (calcPool == null) {
+            calcPool = new ThreadPoolExecutor(featureProperties.getFeatureThreadPoolSize(), featureProperties.getFeatureThreadPoolMaxSize(), 0,
+                    TimeUnit.SECONDS, queue, r -> new Thread(r, "feature-pool-" + index++)
+            );
+        }
     }
 }
