@@ -69,20 +69,20 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
      * 构建填充NativeFeatureBean属性
      *
      * @param featureClass
-     * @param it
+     * @param method
      * @param featureName
      * @param featureObject
      * @return
      */
-    private NativeFeatureBean constructNativeFeatureBean(FeatureClass featureClass, Method it, String featureName, IFeature featureObject) {
+    private NativeFeatureBean constructNativeFeatureBean(FeatureClass featureClass, Method method, String featureName, IFeature featureObject) {
 
-        Feature feature = it.getDeclaredAnnotation(Feature.class);
+        Feature feature = method.getDeclaredAnnotation(Feature.class);
 
         //初始化父节点
-        List<String> parents = Arrays.stream(it.getParameters()).map(Parameter::getName).collect(Collectors.toList());
+        List<String> parents = Arrays.stream(method.getParameters()).map(Parameter::getName).collect(Collectors.toList());
 
         //获取NativeBean的Properties
-        Map<String, String> properties = Arrays.stream(it.getDeclaredAnnotationsByType(Property.class)).collect(
+        Map<String, String> properties = Arrays.stream(method.getDeclaredAnnotationsByType(Property.class)).collect(
                 Collectors.toMap(Property::key, Property::value)
         );
 
@@ -95,7 +95,7 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
                 .parents(parents)
                 .children(new ArrayList<>())
                 .featureMetaData(feature)
-                .returnType(it.getReturnType())
+                .returnType(method.getReturnType())
                 .properties(properties)
                 .build();
     }
