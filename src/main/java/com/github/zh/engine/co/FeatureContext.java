@@ -75,11 +75,11 @@ public class FeatureContext {
         //注入原始数据
         initOriginData(originDataMap);
 
-        //注入需要计算的NativeFeatureBean
-        initNativeFeatureBean(calcFeatures, featureBeanMap);
+        //注入需要计算的NativeFeatureEntity
+        initNativeFeatureEntity(calcFeatures, featureBeanMap);
 
-        //注入计算所依赖的FeatureBean
-        putMiddleFeatureBean(featureBeanMap);
+        //注入计算所依赖的FeatureEntity
+        putMiddleFeatureEntity(featureBeanMap);
 
         //初始化需要计算的变量个数
         initCountDownLatch();
@@ -103,14 +103,14 @@ public class FeatureContext {
         //注入原始数据
         initOriginData(originDataMap);
 
-        //注入外部所需计算的FeatureBean
-        initOuterFeatureBean(outerFeatureBeanMap);
+        //注入外部所需计算的FeatureEntity
+        initOuterFeatureEntity(outerFeatureBeanMap);
 
-        //注入需要计算的NativeFeatureBean
-        initNativeFeatureBean(calcFeatures, featureBeanMap);
+        //注入需要计算的NativeFeatureEntity
+        initNativeFeatureEntity(calcFeatures, featureBeanMap);
 
-        //注入计算所依赖的FeatureBean
-        putMiddleFeatureBean(featureBeanMap);
+        //注入计算所依赖的FeatureEntity
+        putMiddleFeatureEntity(featureBeanMap);
 
         //重新构建依赖关系
         constructFeatureBeanChildren();
@@ -160,11 +160,11 @@ public class FeatureContext {
     }
 
     /**
-     * 注入外部所需计算的FeatureBean
+     * 注入外部所需计算的FeatureEntity
      *
      * @param outerFeatureBeanMap
      */
-    private void initOuterFeatureBean(Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
+    private void initOuterFeatureEntity(Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
         outerFeatureBeanMap.forEach((key, value) -> {
             FeatureEntity featureEntity = FeatureEntity.builder()
                     .featureContext(this)
@@ -181,12 +181,12 @@ public class FeatureContext {
     }
 
     /**
-     * 注入需要计算的NativeFeatureBean
+     * 注入需要计算的NativeFeatureEntity
      *
      * @param calcFeatures
      * @param featureBeanMap
      */
-    private void initNativeFeatureBean(Set<String> calcFeatures, Map<String, AbstractFeatureBean> featureBeanMap) {
+    private void initNativeFeatureEntity(Set<String> calcFeatures, Map<String, AbstractFeatureBean> featureBeanMap) {
         calcFeatures.forEach(feature -> {
             if (!featureBeanMap.containsKey(feature)) {
                 return;
@@ -205,7 +205,12 @@ public class FeatureContext {
         });
     }
 
-    private void putMiddleFeatureBean(Map<String, AbstractFeatureBean> featureBeanMap) {
+    /**
+     * 注入需要计算的中间FeatureEntity
+     *
+     * @param featureBeanMap
+     */
+    private void putMiddleFeatureEntity(Map<String, AbstractFeatureBean> featureBeanMap) {
         Queue<String> queue = new LinkedBlockingDeque<>();
         insertToQueue(queue);
         while (!queue.isEmpty()) {
