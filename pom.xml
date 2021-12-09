@@ -47,7 +47,7 @@
         </plugins>
     </build>
 
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>

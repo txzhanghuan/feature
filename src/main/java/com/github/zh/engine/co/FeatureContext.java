@@ -115,9 +115,18 @@ public class FeatureContext {
         //重新构建依赖关系
         constructFeatureBeanChildren();
 
+        //环分析
+        cycleAnalysis();
+
         //初始化需要计算的变量个数
         initCountDownLatch();
 
+    }
+
+    /**
+     * 环分析
+     */
+    private void cycleAnalysis() {
     }
 
     private void constructFeatureBeanChildren() {
