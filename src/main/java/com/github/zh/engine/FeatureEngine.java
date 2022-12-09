@@ -47,7 +47,7 @@ public class FeatureEngine implements InitializingBean {
      * @return
      */
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures) {
-        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), false);
+        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), calcPool, false);
     }
 
     /**
@@ -59,7 +59,7 @@ public class FeatureEngine implements InitializingBean {
      * @return
      */
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout) {
-        return this.calc(originDataMap, calcFeatures, timeout, false);
+        return this.calc(originDataMap, calcFeatures, timeout, calcPool, false);
     }
 
     /**
@@ -71,7 +71,7 @@ public class FeatureEngine implements InitializingBean {
      * @return
      */
     public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, boolean debug) {
-        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), debug);
+        return this.calc(originDataMap, calcFeatures, featureProperties.getCalcTimeout(), calcPool, debug);
     }
 
     /**
@@ -83,10 +83,10 @@ public class FeatureEngine implements InitializingBean {
      * @param debug         是否debug模式
      * @return
      */
-    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout, boolean debug) {
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures, long timeout, ThreadPoolExecutor calculcatePool, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
-        featureContext.init(calcPool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap());
+        featureContext.init(calculcatePool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap());
         try {
             featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {
@@ -105,7 +105,7 @@ public class FeatureEngine implements InitializingBean {
      */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean) {
-        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), false);
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), calcPool, false);
     }
 
     /**
@@ -119,7 +119,7 @@ public class FeatureEngine implements InitializingBean {
      */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean, long timeout) {
-        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, timeout, false);
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, timeout, calcPool, false);
     }
 
     /**
@@ -133,7 +133,7 @@ public class FeatureEngine implements InitializingBean {
      */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean, boolean debug) {
-        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), debug);
+        return this.calcWithOuterFeatureBean(originDataMap, calcFeatures, outerFeatureBean, featureProperties.getCalcTimeout(), calcPool, debug);
     }
 
     /**
@@ -148,10 +148,10 @@ public class FeatureEngine implements InitializingBean {
      */
     public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures,
                                                         Map<String, ? extends AbstractFeatureBean> outerFeatureBean,
-                                                        long timeout, boolean debug) {
+                                                        long timeout, ThreadPoolExecutor calculatePool, boolean debug) {
         log.debug("Start calculate!");
         FeatureContext featureContext = new FeatureContext();
-        featureContext.initWithOuterFeatureBean(calcPool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap(), outerFeatureBean);
+        featureContext.initWithOuterFeatureBean(calculatePool, originDataMap, calcFeatures, nativeFeatureProcessor.getFeatureBeanMap(), outerFeatureBean);
         try {
             featureContext.executeAll(timeout, MDC.getCopyOfContextMap());
         } catch (InterruptedException e) {

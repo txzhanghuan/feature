@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractFeatureProcessor<T extends AbstractFeatureBean> {
 
     @Getter
-    private final static ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AbstractFeatureBean> featureBeanMap = new ConcurrentHashMap<>();
 
     @Autowired(required = false)
     private List<FeatureBeanPostProcessor<T>> featureBeanPostProcessors;

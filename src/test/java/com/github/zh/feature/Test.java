@@ -38,20 +38,20 @@ public class Test {
     @Feature(output = false)
     public Integer testB(Integer testA) throws InterruptedException {
         int result = testA + 1;
-        Thread.sleep(3000);
+//        Thread.sleep(3000);
         return result;
     }
 
     @Feature(output = false)
     public Integer testC(Integer testA) throws InterruptedException {
         int result = testA + 1;
-        Thread.sleep(4000);
+//        Thread.sleep(4000);
         return result;
     }
 
     @Feature
-    public Integer testD(Integer testB, Integer testC) {
-        int result = testB + testC;
+    public Integer testD(Integer testB, Integer testE) {
+        int result = testB + testE;
         return result;
     }
 
