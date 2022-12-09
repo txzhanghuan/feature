@@ -3,9 +3,11 @@ package com.github.zh.engine.co;
 import com.github.zh.engine.enums.FeatureEnums;
 import com.github.zh.engine.enums.FeatureStates;
 import com.github.zh.engine.exception.CalculateException;
+import com.github.zh.engine.tools.CycleAnalysis;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -19,6 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * Description: 一次请求的上下文
  */
 @Slf4j
+@Component
+
 public class FeatureContext {
 
     @Getter
@@ -81,6 +85,9 @@ public class FeatureContext {
         //注入计算所依赖的FeatureEntity
         putMiddleFeatureEntity(featureBeanMap);
 
+        //环分析
+        cycleAnalysis();
+
         //初始化需要计算的变量个数
         initCountDownLatch();
     }
@@ -127,6 +134,11 @@ public class FeatureContext {
      * 环分析
      */
     private void cycleAnalysis() {
+
+        if (CycleAnalysis.isCycle(featureEntitiesPool)) {
+            throw new CalculateException("These features entities has a cycle!");
+        }
+
     }
 
     private void constructFeatureBeanChildren() {
