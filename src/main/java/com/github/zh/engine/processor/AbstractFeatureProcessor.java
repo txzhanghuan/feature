@@ -41,7 +41,9 @@ public abstract class AbstractFeatureProcessor<T extends AbstractFeatureBean> {
     protected T doFeatureBeanPostProcessor(T abstractFeatureBean) {
         if (!CollectionUtils.isEmpty(featureBeanPostProcessors)) {
             for (FeatureBeanPostProcessor<T> featureBeanPostProcessor : featureBeanPostProcessors) {
-                abstractFeatureBean = featureBeanPostProcessor.postProcessAfterInitializationFeature(abstractFeatureBean);
+                if (featureBeanPostProcessor.returnClass().isAssignableFrom(abstractFeatureBean.getClass())) {
+                    abstractFeatureBean = featureBeanPostProcessor.postProcessAfterInitializationFeature(abstractFeatureBean);
+                }
             }
         }
         return abstractFeatureBean;
