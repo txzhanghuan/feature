@@ -135,9 +135,9 @@ public class FeatureContext {
      */
     private void cycleAnalysis() {
 
-        if (CycleAnalysis.isCycle(featureEntitiesPool)) {
-            throw new CalculateException("These features entities has a cycle!");
-        }
+//        if (CycleAnalysis.isCycle(featureEntitiesPool)) {
+//            throw new CalculateException("These features entities has a cycle!");
+//        }
 
     }
 

@@ -50,8 +50,8 @@ public class Test {
     }
 
     @Feature
-    public Integer testD(Integer testB, Integer testE) {
-        int result = testB + testE;
+    public Integer testD(Integer testB, Integer testA) {
+        int result = testB + testA;
         return result;
     }
 

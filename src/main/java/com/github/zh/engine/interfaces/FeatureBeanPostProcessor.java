@@ -15,4 +15,6 @@ public interface FeatureBeanPostProcessor<T extends AbstractFeatureBean> {
         return featureBean;
     }
 
+    Class<?> returnClass();
+
 }

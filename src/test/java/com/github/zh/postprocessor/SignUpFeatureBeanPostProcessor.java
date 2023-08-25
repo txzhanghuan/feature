@@ -19,4 +19,9 @@ public class SignUpFeatureBeanPostProcessor implements FeatureBeanPostProcessor<
         System.out.println(featureBean.getProperties().toString());
         return featureBean;
     }
+
+    @Override
+    public Class<?> returnClass() {
+        return NativeFeatureBean.class;
+    }
 }

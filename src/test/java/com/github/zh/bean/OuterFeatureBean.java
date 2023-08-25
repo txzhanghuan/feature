@@ -10,6 +10,6 @@ import com.github.zh.engine.co.AbstractFeatureBean;
 public class OuterFeatureBean extends AbstractFeatureBean {
     @Override
     public Object execute(Object[] args) {
-        return null;
+        return args[0];
     }
 }
