@@ -64,7 +64,7 @@ public class Test {
     }
 
     @Feature
-    public Integer testF(Map<String, Integer> testE) {
+    public Integer testF(Map<String, Integer> testE, Integer testC) {
         return 1;
     }
 }

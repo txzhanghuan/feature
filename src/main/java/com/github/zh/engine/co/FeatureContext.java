@@ -7,7 +7,6 @@ import com.github.zh.engine.tools.CycleAnalysis;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -21,8 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * Description: 一次请求的上下文
  */
 @Slf4j
-@Component
-
 public class FeatureContext {
 
     @Getter
