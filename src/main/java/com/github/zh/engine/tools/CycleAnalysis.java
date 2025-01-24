@@ -4,10 +4,7 @@ import com.github.zh.engine.co.FeatureEntity;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
@@ -27,12 +24,12 @@ public class CycleAnalysis {
      */
     public Boolean isCycle(Map<String, FeatureEntity> featureEntityGraph) {
         List<String> roots = getRootNode(featureEntityGraph);
-        if (roots.size() == 0 && featureEntityGraph.size() != 0) {
+        if (roots.isEmpty() && !featureEntityGraph.isEmpty()) {
             return true;
         }
-        Queue<String> queue = new LinkedBlockingDeque<>();
+        LinkedList<String> queue = new LinkedList<>();
         Map<String, Color> nodeColor = new HashMap<>();
-        featureEntityGraph.keySet().forEach(it -> nodeColor.put(it, Color.WIGHT));
+        featureEntityGraph.keySet().forEach(it -> nodeColor.put(it, Color.WHITE));
 
         roots.forEach(it -> {
             queue.offer(it);
@@ -69,6 +66,6 @@ public class CycleAnalysis {
     }
 
     enum Color {
-        WIGHT, GREY, BLACK
+        WHITE, GREY, BLACK
     }
 }
