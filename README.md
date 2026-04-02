@@ -1,52 +1,126 @@
-# feature
+# Feature Engine
 
-函数计算引擎
+轻量级函数计算引擎，专为元数据、指标、特征、变量等**无副作用计算**场景设计。
 
 ## 概述
 
-对于*元数据*、*指标*、*特征*、*变量* 等等<u>不会导致外部状态变更的计算</u>来说本质都是一种函数，通过入参、API调用、数据库读取，再进行一系列运算加工，生成最终结果。
+### 问题背景
 
-那么对于一个集合的函数运算，往往会有很多重复的接口调用或者重复调用同一种函数的操作，而这些操作往往是可以被简化。
+对于元数据、指标、特征、变量等**不会导致外部状态变更的计算**来说，本质都是一种函数：通过入参、API 调用、数据库读取，再进行一系列运算加工，生成最终结果。
 
-这个引擎减少了一个集合中的函数重复接口调用和重复的函数调用的次数，并且通过一个非常轻量级的方式嵌入到项目中。
+在传统的"烟囱模式"下，函数集合的运算往往存在：
+- 重复的接口调用
+- 重复的函数执行
+- 串行执行效率低下
+
+### 解决方案
+
+本引擎通过**DAG（有向无环图）编排**和**并行计算**，实现：
+- 消除重复调用
+- 自动并行执行
+- 轻量级嵌入（Spring Boot Starter）
+
+### 架构图
+
+```mermaid
+graph TD
+    A[FeatureEngine] --> B[DAG Builder]
+    A --> C[Thread Pool]
+    A --> D[Cache Layer]
+    B --> E[拓扑排序]
+    B --> F[依赖解析]
+    C --> G[并行执行]
+    D --> H[结果缓存]
+    D --> I[重复消除]
+```
+
+### 对比示意
 
 #### 烟囱模式调用
 
 ![烟囱式调用](https://tva1.sinaimg.cn/large/007S8ZIlly1gdww13ipajj30fg07naa9.jpg)
 
-外部API调用了2次
+外部 API 调用了 **2 次**
 
 #### 拓扑顺序调用
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdww0zxudlj30ie096glx.jpg)
 
-**通过这个计算引擎，外部API只调用了1次，并且实现了计算并行化。**
+**通过计算引擎，外部 API 只调用 1 次，并实现计算并行化**
 
-## 用法
+## 快速开始
 
-> 该引擎依赖JDK8，以及SpringBoot框架
->
-> 若出现找不到arg0变量的错误，需要在项目中增加-parameters参数，并且rebuild项目，参考设置JDK8获取方法参数的流程
+### 环境要求
+
+- JDK 8+
+- Spring Boot 2.x
+
+### Maven 依赖
+
+```xml
+<dependency>
+    <groupId>com.github.zh</groupId>
+    <artifactId>feature-spring-boot-starter</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### 编译配置
+
+> **注意**：若出现找不到 `arg0` 变量的错误，需要在项目中增加 `-parameters` 编译参数。
 
 ```xml
 <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-compiler-plugin</artifactId>
-  <version>3.1</version>
-  <configuration>
-    <source>8</source>
-    <target>8</target>
-    <encoding>UTF-8</encoding>
-    <!-- 重要 -->
-    <compilerArgs>
-    	<arg>-parameters</arg>
-    </compilerArgs>
-  </configuration>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.8.1</version>
+    <configuration>
+        <source>8</source>
+        <target>8</target>
+        <encoding>UTF-8</encoding>
+        <!-- 重要：必须添加 -->
+        <compilerArgs>
+            <arg>-parameters</arg>
+        </compilerArgs>
+    </configuration>
 </plugin>
 ```
 
-通过标注@Feature的形式，将方法转化为一个函数（仍可以通过方法的形式调用）。 下面代码表示test5依赖test4，test4无入参，可直接计算，当我只需要计算test5的时候，计算引擎会根据函数的依赖关系，生成一个DAG图：
-即：test5--依赖-->test4 那么开始计算的时候，计算引擎会先计算test4的值，再把test4的值放入test5的入参中让其计算。
+## 核心概念
+
+### 注解说明
+
+| 注解 | 作用位置 | 说明 |
+|------|----------|------|
+| `@FeatureClass` | 类 | 标识该类包含特征函数，需配合 `@Component` 使用 |
+| `@Feature` | 方法 | 标识该方法为特征函数，`name` 属性指定函数名（可与方法名不同） |
+
+### 依赖关系
+
+引擎根据函数入参名称自动识别依赖关系，生成 DAG 图进行拓扑排序执行。
+
+**示例**：`test5` 依赖 `test4`
+
+```mermaid
+graph LR
+    A[test4] --> B[test5]
+    style A fill:#e1f5fe
+    style B fill:#e8f5e9
+```
+
+**复杂依赖示例**：
+
+```mermaid
+graph TD
+    A[baseData] --> B[featureA]
+    A --> C[featureB]
+    B --> D[featureC]
+    C --> D
+    D --> E[finalResult]
+    
+    style A fill:#fff3e0
+    style E fill:#e8f5e9
+```
 
 ```
 @FeatureClass
@@ -66,76 +140,122 @@ public class Test {
 }
 ```
 
-> @Feature
-> 标志这个方法是一个函数（方法务必是public），name属性为最后生成该函数的名字（可与方法名不同），入参的类型和参数必须已有的函数相同，不支持同名函数。
+- 函数 `test5` 的入参名为 `test4`，引擎自动识别依赖关系
+- 计算时先执行 `test4`，再将结果作为 `test5` 的入参
 
-> @FeatureClass
-> 作用在类上，标明这个类中有函数需要计算，需要配合Spring中的@Component注解
+### 执行流程
 
----
+```mermaid
+sequenceDiagram
+    participant Client as 调用方
+    participant Engine as FeatureEngine
+    participant DAG as DAG Builder
+    participant Pool as Thread Pool
+    participant Feature as Feature Bean
 
-入参 **originDataMap**原始数据 以及 **calcFeatures**待计算的函数名称。 返回一个计算完成的函数Map。 默认使用线程池进行并行计算（确保拓扑顺序），默认线程数为机器的核心数✖️2
+    Client->>Engine: calc(originDataMap, calcFeatures)
+    Engine->>DAG: 构建依赖图
+    DAG->>DAG: 拓扑排序
+    Engine->>Pool: 提交计算任务
+    Pool->>Feature: 并行执行
+    Feature-->>Pool: 返回结果
+    Pool-->>Engine: 汇总结果
+    Engine-->>Client: 返回计算结果
+```
 
-> 可通过feature.featureThreadPoolSize以及feature.featureThreadPoolMaxSize更改。
+## 使用示例
 
-> 现版本无法解决循环依赖问题，需在编码时确保，加入在环中任意一个节点的原始数据即可打破循环。
+### 调用计算引擎
 
-```Java
+```java
 @Service
 public class FeatureService {
 
     @Autowired
-    FeatureEngine featureEngine;
+    private FeatureEngine featureEngine;
 
-    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures){
+    public Map<String, Object> calc(Map<String, Object> originDataMap, Set<String> calcFeatures) {
         return featureEngine.calc(originDataMap, calcFeatures);
     }
 }
 ```
 
-输入样例：
+### 输入输出示例
 
+**输入**：
 ```json
 {
-  "calcFeatures": [
-    "test5"
-  ],
-  "originDataMap": {
-  }
+  "calcFeatures": ["test5"],
+  "originDataMap": {}
 }
 ```
 
-输出样例：
-
+**输出**：
 ```json
 {
-    "test4": 1,
-    "test5": 2
-  }
+  "test4": 1,
+  "test5": 2
+}
 ```
 
-## 拓展
+## 配置参数
 
-#### 自定义计算Bean
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `feature.featureThreadPoolSize` | CPU 核心数 | 线程池核心线程数 |
+| `feature.featureThreadPoolMaxSize` | CPU 核心数 × 2 | 线程池最大线程数 |
+| `feature.calcTimeout` | 5000 ms | 计算超时时间 |
 
-通过继承AbstractFeatureBean来自定义计算的Bean。
+**application.yml 示例**：
+```yaml
+feature:
+  featureThreadPoolSize: 4
+  featureThreadPoolMaxSize: 8
+  calcTimeout: 10000
+```
 
-```Java
+> **注意**：当前版本无法自动解决循环依赖问题，请在编码时确保无循环依赖，或在环中任意节点提供原始数据以打破循环。
+
+## 高级功能
+
+### 功能扩展架构
+
+```mermaid
+graph LR
+    A[FeatureEngine] --> B[NativeFeatureBean]
+    A --> C[OuterFeatureBean]
+    A --> D[PostProcessor]
+    B --> E[注解方式]
+    C --> F[编程方式]
+    D --> G[拦截处理]
+```
+
+### 自定义计算 Bean
+
+通过继承 `AbstractFeatureBean` 来自定义计算 Bean。
+
+#### AbstractFeatureBean 属性说明
+
+```java
 public abstract class AbstractFeatureBean implements IFeatureBean {
 
-		//必要
+    // 必要：函数名称
     protected String name;
 
-		//非必要
+    // 可选：是否输出到结果
     protected boolean output;
-		
-		//若有需要依赖别的Bean，则需要将其他Bean的名称写入
+
+    // 可选：依赖的其他 Bean 名称列表
     protected List<String> parents;
 
-		//无需填写，系统会自动生成
+    // 自动生成：被依赖的 Bean 名称列表
     protected List<String> children;
 }
-//Sample
+```
+
+#### 自定义 Bean 示例
+
+```java
 public class OuterFeatureBean extends AbstractFeatureBean {
 
     private Function<Object[], Object> fn;
@@ -145,43 +265,58 @@ public class OuterFeatureBean extends AbstractFeatureBean {
         return fn.apply(args);
     }
 
-    public OuterFeatureBean(String name, Function<Object[], Object> fn){
+    public OuterFeatureBean(String name, Function<Object[], Object> fn) {
         this.name = name;
         this.fn = fn;
     }
 }
 ```
 
-引擎计算加入外部Bean的方法
+#### 使用外部 Bean 进行计算
 
-```Java
+```java
 @Service
 @Slf4j
 public class FeatureService {
 
     @Autowired
-    FeatureEngine featureEngine;
+    private FeatureEngine featureEngine;
 
-    public Map<String, Object> calcWithOuterFeatureBean(Map<String, Object> originDataMap, Set<String> calcFeatures){
-        Map<String, OuterFeatureBean> map = new HashMap<>(1);
+    public Map<String, Object> calcWithOuterFeatureBean(
+            Map<String, Object> originDataMap, 
+            Set<String> calcFeatures) {
+        
+        Map<String, OuterFeatureBean> map = new HashMap<>();
         map.put("zh", new OuterFeatureBean("zh", (a) -> 1));
-        return featureEngine.calcWithOuterFeatureBean(originDataMap, calcFeatures, map);
+        
+        return featureEngine.calcWithOuterFeatureBean(
+            originDataMap, calcFeatures, map);
     }
 }
 ```
 
-#### 本地计算FeatureBean后置处理器
+### FeatureBean 后置处理器
 
-```Java
-public interface FeaturePostProcessor{
+实现 `FeatureBeanPostProcessor` 接口，可在 Bean 初始化后进行自定义处理（类似 Spring 的 `BeanPostProcessor`）。
+
+```java
+public interface FeatureBeanPostProcessor {
 
     @Nullable
-    default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(T featureBean, String featureBeanName) throws BeansException {
+    default <T extends AbstractFeatureBean> T postProcessAfterInitializationFeature(
+            T featureBean, String featureBeanName) throws BeansException {
         return featureBean;
     }
 }
 ```
 
-同Spring的 **BeanPostProcessor**
+## API 参考
 
+### FeatureEngine 主要方法
 
+| 方法 | 说明 |
+|------|------|
+| `calc(originDataMap, calcFeatures)` | 基础计算方法 |
+| `calc(originDataMap, calcFeatures, timeout)` | 带超时时间的计算 |
+| `calc(originDataMap, calcFeatures, debug)` | 开启 Debug 模式 |
+| `calcWithOuterFeatureBean(...)` | 结合外部 Bean 计算 |
