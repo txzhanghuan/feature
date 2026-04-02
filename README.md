@@ -1,5 +1,9 @@
 # Feature Engine
 
+![Build Status](https://github.com/[USERNAME]/feature-engine/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
+![Maven Central](https://img.shields.io/maven-central/v/com.github.zh/feature-engine.svg)
+
 轻量级函数计算引擎，专为元数据、指标、特征、变量等**无副作用计算**场景设计。
 
 ## 概述
@@ -202,16 +206,20 @@ public class FeatureService {
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
-| `feature.featureThreadPoolSize` | CPU 核心数 | 线程池核心线程数 |
-| `feature.featureThreadPoolMaxSize` | CPU 核心数 × 2 | 线程池最大线程数 |
-| `feature.calcTimeout` | 5000 ms | 计算超时时间 |
+| `com.github.zh.engine.feature.featureThreadPoolSize` | CPU 核心数 | 线程池核心线程数 |
+| `com.github.zh.engine.feature.featureThreadPoolMaxSize` | CPU 核心数 × 2 | 线程池最大线程数 |
+| `com.github.zh.engine.feature.calcTimeout` | 5000 ms | 计算超时时间 |
 
 **application.yml 示例**：
 ```yaml
-feature:
-  featureThreadPoolSize: 4
-  featureThreadPoolMaxSize: 8
-  calcTimeout: 10000
+com:
+  github:
+    zh:
+      engine:
+        feature:
+          featureThreadPoolSize: 4
+          featureThreadPoolMaxSize: 8
+          calcTimeout: 10000
 ```
 
 > **注意**：当前版本无法自动解决循环依赖问题，请在编码时确保无循环依赖，或在环中任意节点提供原始数据以打破循环。
@@ -320,3 +328,73 @@ public interface FeatureBeanPostProcessor {
 | `calc(originDataMap, calcFeatures, timeout)` | 带超时时间的计算 |
 | `calc(originDataMap, calcFeatures, debug)` | 开启 Debug 模式 |
 | `calcWithOuterFeatureBean(...)` | 结合外部 Bean 计算 |
+
+## Troubleshooting
+
+### 常见问题
+
+#### 1. 编译参数 `-parameters` 未启用导致的解析失败
+
+**症状**：运行时抛出异常，提示找不到 `arg0`、`arg1` 等参数名。
+
+**原因**：Java 编译器默认不保留方法参数名，需要显式启用 `-parameters` 参数。
+
+**解决方案**：在 `pom.xml` 中添加编译配置：
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.8.1</version>
+    <configuration>
+        <source>8</source>
+        <target>8</target>
+        <compilerArgs>
+            <arg>-parameters</arg>
+        </compilerArgs>
+    </configuration>
+</plugin>
+```
+
+如果使用 IntelliJ IDEA，还需要在 `Settings` → `Build, Execution, Deployment` → `Compiler` → `Java Compiler` 中添加 `-parameters` 参数。
+
+#### 2. 循环依赖导致的异常
+
+**症状**：启动时抛出循环依赖检测异常，或计算时出现死循环/栈溢出。
+
+**原因**：Feature 之间存在循环依赖关系（A → B → C → A）。
+
+**解决方案**：
+- 检查 Feature 方法的参数依赖关系，确保不形成环
+- 使用 DAG 可视化工具分析依赖图
+- 在环中的某个节点通过 `originDataMap` 提供原始数据，打破循环
+
+#### 3. 线程池配置建议
+
+**场景**：计算任务执行缓慢或出现超时。
+
+**建议**：
+
+| 场景 | 核心线程数 | 最大线程数 | 说明 |
+|------|-----------|-----------|------|
+| CPU 密集型 | CPU 核心数 | CPU 核心数 | 避免过多线程切换 |
+| IO 密集型 | CPU 核心数 × 2 | CPU 核心数 × 4 | 利用 IO 等待时间 |
+| 混合型 | CPU 核心数 | CPU 核心数 × 2 | 平衡两者 |
+
+**配置示例**（8 核 CPU，IO 密集型场景）：
+
+```yaml
+com:
+  github:
+    zh:
+      engine:
+        feature:
+          featureThreadPoolSize: 16
+          featureThreadPoolMaxSize: 32
+          calcTimeout: 10000
+```
+
+**超时配置建议**：
+- 根据实际业务响应时间要求设置 `calcTimeout`
+- 建议设置合理的超时时间，避免请求长时间阻塞
+- 监控计算耗时，及时调整配置

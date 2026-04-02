@@ -23,3 +23,10 @@
 /.vscode
 practice.code-workspace
 *.lst
+
+# macOS
+.DS_Store
+
+# Gradle (future compatibility)
+.gradle/
+build/
