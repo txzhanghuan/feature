@@ -15,6 +15,14 @@
 - [README.md](file://README.md)
 </cite>
 
+## 更新摘要
+**变更内容**
+- 新增Properties和Property注解的详细文档，支持重复属性注解
+- 增强FeatureClass注解的文档说明，包含描述信息的使用场景
+- 更新注解处理工作原理，展示与Spring框架的集成
+- 添加属性配置传递机制的详细说明
+- 更新使用示例，包含重复属性注解的实际应用场景
+
 ## 目录
 1. [简介](#简介)
 2. [项目结构](#项目结构)
@@ -29,9 +37,9 @@
 
 ## 简介
 本文件面向注解系统的使用者与维护者，系统性梳理并文档化以下注解与相关能力：
-- @Feature 注解：用于标识“特征函数”，支持 name 与 output 等属性。
-- @FeatureClass 注解：用于标识“特征类”，通常与 Spring 组件注解配合使用。
-- @Properties 与 @Property 注解：用于为特征函数附加键值对形式的属性配置，支持重复声明。
+- @Feature 注解：用于标识"特征函数"，支持 name 与 output 等属性。
+- @FeatureClass 注解：用于标识"特征类"，通常与 Spring 组件注解配合使用，支持描述信息。
+- @Properties 与 @Property 注解：用于为特征函数附加键值对形式的属性配置，支持重复声明，实现灵活的元数据管理。
 
 文档同时解释注解处理的工作原理、依赖解析机制、配置传递方式，并给出从简单到复杂的使用示例路径与最佳实践建议。
 
@@ -67,7 +75,7 @@ I --> E
 J --> H
 ```
 
-图表来源
+**图表来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
@@ -79,7 +87,7 @@ J --> H
 - [Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 - [application.yml](file://src/test/resources/application.yml)
 
-章节来源
+**章节来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
@@ -93,21 +101,21 @@ J --> H
 - [README.md](file://README.md)
 
 ## 核心注解
-- @Feature：标注于方法之上，标识该方法为“特征函数”。支持 name 与 output 两个属性：
+- @Feature：标注于方法之上，标识该方法为"特征函数"。支持 name 与 output 两个属性：
   - name：指定生成的特征名称（可与方法名不同）。
   - output：控制该特征结果是否输出到最终结果集中。
-- @FeatureClass：标注于类之上，标识该类包含特征函数，通常与 Spring 组件注解（如 @Component）共同使用。
-- @Properties：方法级容器注解，聚合多个 @Property。
-- @Property：方法级注解，声明键值对形式的属性配置，支持重复声明（@Repeatable）。
+- @FeatureClass：标注于类之上，标识该类包含特征函数，通常与 Spring 组件注解（如 @Component）共同使用。新增 description 属性用于描述特征类的功能或用途。
+- @Properties：方法级容器注解，聚合多个 @Property 注解，支持重复属性配置。
+- @Property：方法级注解，声明键值对形式的属性配置，支持重复声明（@Repeatable），用于为特征函数附加元数据。
 
-章节来源
+**章节来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
 - [Property.java](file://src/main/java/com/github/zh/engine/annotation/properties/Property.java)
 
 ## 架构总览
-注解驱动的特征函数在运行时由 FeatureEngine 统一编排，通过依赖解析生成 DAG 并并行执行；@Properties/@Property 提供的键值对配置可随特征函数传递到运行时上下文。
+注解驱动的特征函数在运行时由 FeatureEngine 统一编排，通过依赖解析生成 DAG 并并行执行；@Properties/@Property 提供的键值对配置可随特征函数传递到运行时上下文。整个系统通过 Spring Boot 自动配置机制集成。
 
 ```mermaid
 sequenceDiagram
@@ -124,7 +132,7 @@ Engine->>Gen : "按需生成适配类"
 Engine-->>Caller : "返回计算结果"
 ```
 
-图表来源
+**图表来源**
 - [FeatureEngine.java](file://src/main/java/com/github/zh/engine/FeatureEngine.java)
 - [FeatureClassGenerator.java](file://src/main/java/com/github/zh/engine/clz/FeatureClassGenerator.java)
 - [FeatureAutoConfiguration.java](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java)
@@ -139,44 +147,46 @@ Engine-->>Caller : "返回计算结果"
   - output：布尔，默认 true。控制该特征是否纳入最终结果集。
 - 语义与行为
   - 与 @FeatureClass 配合使用，标识该类中的特征函数。
-  - 依赖解析基于方法参数名自动完成，无需额外 dependsOn 参数。
+  - 依赖解析基于方法参数名自动完成，参数名即为上游特征名称。
 - 使用示例（参考路径）
   - 简单特征定义：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
   - 复杂依赖关系（多参数依赖）：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
   - 关闭输出（仅作为中间步骤）：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 
-章节来源
+**章节来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 
 ### @FeatureClass 注解
 - 作用位置：类
 - 属性
-  - description：字符串，默认空串。可用于描述该特征类的功能或用途。
+  - description：字符串，默认空串。用于描述该特征类的功能或用途，便于文档生成和系统管理。
 - 语义与行为
   - 标识该类包含特征函数，通常与 Spring 组件注解（如 @Component）一起使用，使特征函数被容器管理。
+  - 支持描述信息，便于系统理解和维护。
 - 使用示例（参考路径）
   - 特征类定义与组合：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 
-章节来源
+**章节来源**
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 
 ### @Properties 与 @Property 注解
 - 作用位置：方法
 - @Property 属性
-  - key：字符串，必填。属性键。
-  - value：字符串，必填。属性值。
+  - key：字符串，必填。属性键，用于标识配置项的名称。
+  - value：字符串，必填。属性值，对应配置项的具体值。
 - @Properties 属性
-  - value：@Property 数组，必填。用于聚合多个 @Property。
+  - value：@Property 数组，必填。用于聚合多个 @Property 注解。
 - 语义与行为
-  - 通过 @Repeatable 支持在同一方法上多次声明 @Property。
-  - 与特征函数绑定，形成“函数+属性”的配置单元，便于运行时读取与传递。
+  - 通过 @Repeatable 支持在同一方法上多次声明 @Property，实现重复属性注解。
+  - 与特征函数绑定，形成"函数+属性"的配置单元，便于运行时读取与传递。
+  - 支持元数据管理，如分类、复杂度、权限等信息。
 - 使用示例（参考路径）
   - 单个属性配置：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
   - 多属性配置：[Test.java](file://src/test/java/com/github/zh/feature/Test.java)
 
-章节来源
+**章节来源**
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
 - [Property.java](file://src/main/java/com/github/zh/engine/annotation/properties/Property.java)
 - [Test.java](file://src/test/java/com/github/zh/feature/Test.java)
@@ -201,7 +211,7 @@ Parallel --> Collect["收集输出受 @Feature.output 控制"]
 Collect --> End(["结束"])
 ```
 
-图表来源
+**图表来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
@@ -227,7 +237,7 @@ CONF["FeatureAutoConfiguration"] --> ENG
 CONF --> PROPS["FeatureProperties"]
 ```
 
-图表来源
+**图表来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)
@@ -237,7 +247,7 @@ CONF --> PROPS["FeatureProperties"]
 - [FeatureAutoConfiguration.java](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java)
 - [FeatureProperties.java](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java)
 
-章节来源
+**章节来源**
 - [FeatureAutoConfiguration.java](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java)
 - [FeatureProperties.java](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java)
 - [FeatureEngine.java](file://src/main/java/com/github/zh/engine/FeatureEngine.java)
@@ -245,7 +255,7 @@ CONF --> PROPS["FeatureProperties"]
 
 ## 性能与配置
 - 线程池与超时
-  - 线程池核心/最大大小与计算超时时间可通过配置文件设置，未设置时采用默认值（核心数与默认超时）。
+  - 线程池核心/最大大小与计算超时时间可通过配置文件设置，未设置时采用默认值（核心数×2与默认超时10秒）。
 - 配置示例（参考路径）
   - 应用配置样例：[application.yml](file://src/test/resources/application.yml)
   - 配置项说明与默认值：[FeatureProperties.java](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java)
@@ -254,7 +264,7 @@ CONF --> PROPS["FeatureProperties"]
   - 明确 output 行为，仅保留必要的输出以减少结果集体积。
   - 避免循环依赖，必要时引入原始数据作为断点。
 
-章节来源
+**章节来源**
 - [application.yml](file://src/test/resources/application.yml)
 - [FeatureProperties.java](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java)
 - [README.md](file://README.md)
@@ -264,16 +274,18 @@ CONF --> PROPS["FeatureProperties"]
   - 编译期找不到参数名：需要在编译插件中启用参数名记录（例如添加 -parameters）。
   - 循环依赖导致卡死：请在编码阶段规避，或在环中注入原始数据。
   - 结果缺失：检查 @Feature.output 是否为 false 导致未输出。
+  - 属性配置丢失：确认 @Property 注解正确声明且未被覆盖。
 - 定位建议
   - 开启调试模式（如有）观察执行序列与依赖图。
   - 核对 @Feature.name 与方法参数名是否一致，避免依赖解析失败。
   - 检查 @Properties/@Property 的 key/value 是否正确传入运行时。
 
-章节来源
+**章节来源**
 - [README.md](file://README.md)
 
 ## 结论
 - 本注解体系以简洁明了的方式定义特征函数与其配置，结合自动依赖解析与并行执行，能够高效地完成无副作用的函数式计算。
+- 新增的属性注解系统提供了强大的元数据管理能力，支持重复属性配置，满足复杂业务场景的需求。
 - 建议在团队内统一命名规范（尤其是 @Feature.name），明确 output 策略，并在配置层面合理设置线程池与超时，以获得稳定且高性能的执行效果。
 
 ## 附录
@@ -291,15 +303,15 @@ CONF --> PROPS["FeatureProperties"]
   - 作用：标记特征函数，支持命名与输出控制
 - @FeatureClass
   - 属性：description（字符串）
-  - 作用：标记特征类，常与组件注解配合
+  - 作用：标记特征类，常与组件注解配合，支持描述信息
 - @Properties
   - 属性：value（@Property[]）
-  - 作用：聚合多个 @Property
+  - 作用：聚合多个 @Property 注解，支持重复属性配置
 - @Property
   - 属性：key（字符串）、value（字符串）
-  - 作用：为特征函数附加键值对配置
+  - 作用：为特征函数附加键值对配置，支持重复声明
 
-章节来源
+**章节来源**
 - [Feature.java](file://src/main/java/com/github/zh/engine/annotation/Feature.java)
 - [FeatureClass.java](file://src/main/java/com/github/zh/engine/annotation/FeatureClass.java)
 - [Properties.java](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java)

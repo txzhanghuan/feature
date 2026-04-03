@@ -14,6 +14,13 @@
 - [README.md](file://README.md)
 </cite>
 
+## 更新摘要
+**变更内容**
+- FeatureProperties类新增详细的默认值管理和配置示例
+- 新增threadPoolNamePrefix配置参数，支持线程命名约定
+- 增强了配置参数对系统性能的影响分析和调优建议
+- 完善了配置验证和故障排查指导
+
 ## 目录
 1. [简介](#简介)
 2. [项目结构](#项目结构)
@@ -67,17 +74,17 @@ SF --> FAC
 YML --> FP
 ```
 
-图表来源
-- [FeatureProperties.java:1-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L36)
-- [FeatureAutoConfiguration.java:1-37](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L37)
-- [FeatureEngine.java:1-172](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L1-L172)
+**图表来源**
+- [FeatureProperties.java:1-106](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L106)
+- [FeatureAutoConfiguration.java:1-94](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L94)
+- [FeatureEngine.java:1-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L1-L325)
 - [NativeFeatureProcessor.java:1-131](file://src/main/java/com/github/zh/engine/processor/NativeFeatureProcessor.java#L1-L131)
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
 - [application.yml:1-9](file://src/test/resources/application.yml#L1-L9)
 
-章节来源
-- [FeatureProperties.java:1-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L36)
-- [FeatureAutoConfiguration.java:1-37](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L37)
+**章节来源**
+- [FeatureProperties.java:1-106](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L106)
+- [FeatureAutoConfiguration.java:1-94](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L94)
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
 
 ## 核心组件
@@ -88,10 +95,10 @@ YML --> FP
 - NativeFeatureProcessor：扫描注解、构造 Feature Bean
 - 注解属性：用于在方法上声明属性键值对
 
-章节来源
-- [FeatureProperties.java:1-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L36)
-- [FeatureAutoConfiguration.java:1-37](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L37)
-- [FeatureEngine.java:1-172](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L1-L172)
+**章节来源**
+- [FeatureProperties.java:1-106](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L1-L106)
+- [FeatureAutoConfiguration.java:1-94](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L1-L94)
+- [FeatureEngine.java:1-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L1-L325)
 - [NativeFeatureProcessor.java:1-131](file://src/main/java/com/github/zh/engine/processor/NativeFeatureProcessor.java#L1-L131)
 - [Properties.java:1-18](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java#L1-L18)
 - [Property.java:1-20](file://src/main/java/com/github/zh/engine/annotation/properties/Property.java#L1-L20)
@@ -117,11 +124,11 @@ Eng->>Eng : 初始化线程池(若未注入)
 Proc-->>App : 扫描并注册 Feature Bean
 ```
 
-图表来源
-- [FeatureAutoConfiguration.java:19-36](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L19-L36)
+**图表来源**
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
-- [FeatureEngine.java:163-170](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L163-L170)
-- [FeatureProperties.java:14-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L14-L36)
+- [FeatureEngine.java:294-300](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L294-L300)
+- [FeatureProperties.java:54-105](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L54-L105)
 
 ## 详细组件分析
 
@@ -131,16 +138,22 @@ Proc-->>App : 扫描并注册 Feature Bean
   - featureThreadPoolSize：线程池核心线程数，默认值为 CPU 核心数 × 2
   - featureThreadPoolMaxSize：线程池最大线程数，默认值为 CPU 核心数 × 2
   - calcTimeout：计算超时时间（毫秒），默认值为 10000
+  - threadPoolNamePrefix：线程池线程命名前缀，默认值为 "feature-pool-"
 - 默认值来源
   - DEFAULT_SYSTEM_CORE_SIZE：通过运行时获取可用处理器数量
-  - DEFAULT_CALC_TIMEOUT：固定默认超时时间
+  - DEFAULT_CALC_TIMEOUT：固定默认超时时间 10000 毫秒
+  - DEFAULT_POOL_SIZE_MULTIPLIER：默认线程池大小乘数 2
+  - DEFAULT_THREAD_POOL_NAME_PREFIX：默认线程命名前缀 "feature-pool-"
+
+**更新** 新增了线程池命名前缀配置，支持更好的线程识别和调试
 
 参数与行为映射
 - 线程池规模直接影响并发度与资源占用；核心线程数与最大线程数相等时，线程池为固定大小
 - 超时时间决定单次计算的最大等待时长，避免长时间阻塞
+- 线程命名前缀便于在日志和监控中识别特定的计算线程
 
-章节来源
-- [FeatureProperties.java:14-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L14-L36)
+**章节来源**
+- [FeatureProperties.java:54-105](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L54-L105)
 
 ### FeatureAutoConfiguration 自动配置机制与扩展
 - 装配条件
@@ -155,20 +168,23 @@ Proc-->>App : 扫描并注册 Feature Bean
   - 通过在容器中提供自定义的 FeatureEngine 或 NativeFeatureProcessor Bean，可覆盖默认装配
   - 通过实现 FeatureBeanPostProcessor 接口扩展 Bean 初始化后的处理逻辑
 
-章节来源
-- [FeatureAutoConfiguration.java:19-36](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L19-L36)
+**章节来源**
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
 
 ### FeatureEngine 与配置参数的集成
 - 线程池初始化
   - 当未显式注入 ThreadPoolExecutor 时，FeatureEngine 在 afterPropertiesSet 中按配置参数创建固定大小线程池
+  - 使用配置的线程命名前缀为每个线程设置有意义的名称
 - 计算入口
   - 提供多重重载的 calc 与 calcWithOuterFeatureBean 方法，内部统一使用配置中的超时时间与线程池执行任务
 
-章节来源
-- [FeatureEngine.java:163-170](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L163-L170)
-- [FeatureEngine.java:49-96](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L49-L96)
-- [FeatureEngine.java:106-161](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L106-L161)
+**更新** afterPropertiesSet方法中实现了完整的线程池初始化逻辑，包括线程命名
+
+**章节来源**
+- [FeatureEngine.java:294-300](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L294-L300)
+- [FeatureEngine.java:102-104](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L102-L104)
+- [FeatureEngine.java:176-179](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L176-L179)
 
 ### NativeFeatureProcessor 与注解属性
 - 注解属性
@@ -178,7 +194,7 @@ Proc-->>App : 扫描并注册 Feature Bean
   - 扫描标注了 @FeatureClass 的类，提取标注了 @Feature 的方法
   - 通过反射与字节码生成，构建 NativeFeatureBean，并将 @Property 的键值对注入到 Bean 元数据中
 
-章节来源
+**章节来源**
 - [Property.java:1-20](file://src/main/java/com/github/zh/engine/annotation/properties/Property.java#L1-L20)
 - [Properties.java:1-18](file://src/main/java/com/github/zh/engine/annotation/properties/Properties.java#L1-L18)
 - [NativeFeatureProcessor.java:32-101](file://src/main/java/com/github/zh/engine/processor/NativeFeatureProcessor.java#L32-L101)
@@ -190,6 +206,19 @@ Proc-->>App : 扫描并注册 Feature Bean
   - 示例片段：feature.featureThreadPoolSize: 2
   - 说明：该示例展示了如何在 YAML 中设置线程池大小；其他参数可按相同层级添加
 
+- 完整配置示例
+  ```yaml
+  com:
+    github:
+      zh:
+        engine:
+          feature:
+            featureThreadPoolSize: 16
+            featureThreadPoolMaxSize: 32
+            calcTimeout: 5000
+            threadPoolNamePrefix: "my-feature-pool-"
+  ```
+
 - Java 配置类方式
   - 通过 @EnableConfigurationProperties(FeatureProperties.class) 与 @Configuration 组合，结合 @Value 或 @ConstructorBinding 方式自定义绑定
   - 注意：若需完全替换默认装配，可参考自动配置类的条件与装配策略，提供自定义 Bean 并避免与默认 Bean 冲突
@@ -197,10 +226,12 @@ Proc-->>App : 扫描并注册 Feature Bean
 - 依赖与编译参数
   - pom.xml 中包含 spring-boot-autoconfigure 依赖与 -parameters 编译参数配置，确保运行时能正确解析方法参数名
 
-章节来源
+**更新** 新增了完整的配置示例，包括新的threadPoolNamePrefix参数
+
+**章节来源**
 - [application.yml:1-9](file://src/test/resources/application.yml#L1-L9)
-- [pom.xml:52-86](file://pom.xml#L52-L86)
-- [pom.xml:88-99](file://pom.xml#L88-L99)
+- [pom.xml:114-155](file://pom.xml#L114-L155)
+- [pom.xml:157-172](file://pom.xml#L157-L172)
 
 ## 依赖分析
 - 自动装配注册
@@ -219,15 +250,15 @@ FAC --> NFP["NativeFeatureProcessor"]
 FE --> FP["FeatureProperties"]
 ```
 
-图表来源
+**图表来源**
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
-- [FeatureAutoConfiguration.java:19-36](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L19-L36)
-- [FeatureEngine.java:32-40](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L32-L40)
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
+- [FeatureEngine.java:78-86](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L78-L86)
 
-章节来源
+**章节来源**
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
-- [FeatureAutoConfiguration.java:19-36](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L19-L36)
-- [FeatureEngine.java:32-40](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L32-L40)
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
+- [FeatureEngine.java:78-86](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L78-L86)
 
 ## 性能考虑
 - 线程池规模
@@ -238,10 +269,15 @@ FE --> FP["FeatureProperties"]
   - 建议：结合业务耗时统计与 SLA 设定，逐步收敛至最优值
 - 线程池队列
   - FeatureEngine 使用有界队列（LinkedBlockingQueue）；建议监控队列长度与拒绝策略，避免堆积
+- 线程命名
+  - threadPoolNamePrefix 支持自定义线程命名，便于在日志和监控中识别特定的计算线程
+  - 建议：使用有意义的前缀标识不同的计算实例或环境
 - 调优步骤
   - 基准压测：在预生产环境模拟峰值流量，记录平均/99 分位耗时
   - 渐进调整：优先调整线程池大小，其次调整超时时间
   - 观察指标：线程池活跃线程数、队列长度、拒绝次数、超时次数
+
+**更新** 新增了线程命名相关的性能考虑和调优建议
 
 ## 故障排查指南
 - 自动配置未生效
@@ -251,6 +287,7 @@ FE --> FP["FeatureProperties"]
 - 线程池异常
   - 若自定义注入了 ThreadPoolExecutor，确认其生命周期与关闭策略
   - 监控线程池拒绝与队列堆积情况
+  - 检查线程命名前缀是否正确设置，便于问题定位
 - 超时问题
   - 提升 calcTimeout 或优化计算逻辑
   - 检查是否存在死循环或阻塞操作
@@ -258,17 +295,25 @@ FE --> FP["FeatureProperties"]
   - 当前版本不支持自动解决循环依赖；请在编码阶段规避，或在环中任一节点提供原始数据以打破循环
 - 编译参数缺失
   - 若出现参数名解析错误，请在编译插件中添加 -parameters 参数
+- 线程命名问题
+  - 如果发现线程名称无法识别，检查 threadPoolNamePrefix 配置是否正确
+  - 确认线程池初始化时是否正确设置了命名前缀
 
-章节来源
-- [FeatureAutoConfiguration.java:20-22](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L20-L22)
+**更新** 新增了线程命名相关的故障排查指导
+
+**章节来源**
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
 - [spring.factories:1-2](file://src/main/resources/META-INF/spring.factories#L1-L2)
-- [README.md:162](file://README.md#L162)
-- [pom.xml:52-86](file://pom.xml#L52-L86)
+- [README.md:72-91](file://README.md#L72-L91)
+- [pom.xml:114-155](file://pom.xml#L114-L155)
 
 ## 结论
-- FeatureProperties 提供了线程池规模与计算超时等关键配置，FeatureAutoConfiguration 则以条件装配的方式无缝接入 Spring Boot 应用
+- FeatureProperties 提供了线程池规模、计算超时和线程命名等关键配置，FeatureAutoConfiguration 则以条件装配的方式无缝接入 Spring Boot 应用
 - 通过合理的参数调优与监控，可显著提升计算吞吐与稳定性
 - 建议在生产环境中结合压测数据与业务特征，制定分环境差异化配置策略
+- 新增的线程命名功能有助于更好的运维监控和问题诊断
+
+**更新** 结论部分新增了关于线程命名功能的价值说明
 
 ## 附录
 
@@ -278,9 +323,12 @@ FE --> FP["FeatureProperties"]
   - featureThreadPoolSize：线程池核心线程数，默认为 CPU 核心数 × 2
   - featureThreadPoolMaxSize：线程池最大线程数，默认为 CPU 核心数 × 2
   - calcTimeout：计算超时时间（毫秒），默认为 10000
+  - threadPoolNamePrefix：线程池线程命名前缀，默认为 "feature-pool-"
 
-章节来源
-- [FeatureProperties.java:14-36](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L14-L36)
+**更新** 新增了threadPoolNamePrefix参数的默认值说明
+
+**章节来源**
+- [FeatureProperties.java:54-105](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L54-L105)
 
 ### 自动配置条件与装配清单
 - 条件
@@ -290,5 +338,16 @@ FE --> FP["FeatureProperties"]
   - NativeFeatureProcessor（若不存在）
   - FeatureEngine（若不存在）
 
-章节来源
-- [FeatureAutoConfiguration.java:19-36](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L19-L36)
+**章节来源**
+- [FeatureAutoConfiguration.java:60-62](file://src/main/java/com/github/zh/engine/config/FeatureAutoConfiguration.java#L60-L62)
+
+### 默认值管理详情
+- DEFAULT_SYSTEM_CORE_SIZE：通过 Runtime.getRuntime().availableProcessors() 获取系统核心数
+- DEFAULT_CALC_TIMEOUT：固定值 10000 毫秒（10 秒）
+- DEFAULT_POOL_SIZE_MULTIPLIER：固定值 2
+- DEFAULT_THREAD_POOL_NAME_PREFIX：固定值 "feature-pool-"
+
+**更新** 新增了完整的默认值管理详情
+
+**章节来源**
+- [FeatureProperties.java:56-74](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L56-L74)
