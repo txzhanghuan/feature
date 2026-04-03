@@ -2,7 +2,7 @@
 
 **Lightweight Function Calculation Orchestration Engine** — Making Complex Calculations Simple
 
-![Build Status](https://github.com/[USERNAME]/feature-engine/actions/workflows/ci.yml/badge.svg)
+![Build Status](https://github.com/txzhanghuan/feature/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
 ![Maven Central](https://img.shields.io/maven-central/v/com.github.zh/feature-engine.svg)
 
