@@ -17,32 +17,35 @@
 
 package com.github.zh.engine.cache;
 
-import org.springframework.stereotype.Component;
-
 /**
- * @author ahuan.zh
+ * Cache wrapper interface for key existence tracking.
+ *
+ * @author zhanghuan
  * @version 1.0
  * @date 2022/3/3 19:54
- * @deprecated Reserved for future use. Not currently used in the engine.
+ * @deprecated Reserved for future use. Not currently utilized in the engine.
+ *             Consider using external caching solutions if needed.
  */
 @Deprecated
-@Component
 public interface CacheWrapper {
 
     /**
-     * 设置key是否存在
+     * Sets a key in the cache.
      *
-     * @param key
+     * @param key the key to set
      */
     void set(String key);
 
     /**
-     * 判断Key是否存在
+     * Checks if a key exists in the cache.
      *
-     * @param key
-     * @return
+     * @param key the key to check
+     * @return {@code true} if the key exists; {@code false} otherwise
      */
     Boolean get(String key);
 
+    /**
+     * Clears all entries from the cache.
+     */
     void clearAll();
 }

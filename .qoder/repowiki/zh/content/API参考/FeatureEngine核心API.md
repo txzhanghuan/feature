@@ -12,9 +12,10 @@
 - [FeatureEnums.java](file://src/main/java/com/github/zh/engine/enums/FeatureEnums.java)
 - [FeatureStates.java](file://src/main/java/com/github/zh/engine/enums/FeatureStates.java)
 - [CalculateException.java](file://src/main/java/com/github/zh/engine/exception/CalculateException.java)
-- [README.md](file://README.md)
+- [FeatureEngineAdvancedTest.java](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java)
 - [OuterFeatureBean.java](file://src/test/java/com/github/zh/bean/OuterFeatureBean.java)
 - [Test.java](file://src/test/java/com/github/zh/feature/Test.java)
+- [application.yml](file://src/test/resources/application.yml)
 </cite>
 
 ## 更新摘要
@@ -23,6 +24,8 @@
 - 统一计算方法到doCalc私有方法，增强代码一致性
 - 增强错误处理机制，完善异常类型和处理策略
 - 改进线程池管理，添加优雅关闭和资源回收
+- 新增高级功能测试，涵盖多特征并行计算、调试模式操作、超时处理等高级用法
+- 完善异常处理和线程中断处理机制
 
 ## 目录
 1. [简介](#简介)
@@ -30,16 +33,17 @@
 3. [核心组件](#核心组件)
 4. [架构总览](#架构总览)
 5. [详细组件分析](#详细组件分析)
-6. [依赖分析](#依赖分析)
-7. [性能考虑](#性能考虑)
-8. [故障排查指南](#故障排查指南)
-9. [结论](#结论)
-10. [附录](#附录)
+6. [高级功能测试](#高级功能测试)
+7. [依赖分析](#依赖分析)
+8. [性能考虑](#性能考虑)
+9. [故障排查指南](#故障排查指南)
+10. [结论](#结论)
+11. [附录](#附录)
 
 ## 简介
 本文件面向FeatureEngine核心API，系统性梳理calc()系列与calcWithOuterFeatureBean()系列方法的重载、参数、返回值、使用场景与性能特性；详解外部特征Bean的传入与集成方式；提供基础用法、超时控制、调试模式等完整使用示例；说明线程池参数对计算性能的影响及调优建议；并给出异常处理与最佳实践。
 
-**更新** 新增资源清理和优雅关闭机制，统一计算方法到doCalc，增强错误处理能力。
+**更新** 新增资源清理和优雅关闭机制，统一计算方法到doCalc，增强错误处理能力。新增高级功能测试，涵盖多特征并行计算、调试模式操作、超时处理等高级用法的验证。
 
 ## 项目结构
 - 引擎入口：FeatureEngine（现实现DisposableBean接口）
@@ -49,7 +53,7 @@
 - 特征Bean抽象：AbstractFeatureBean、NativeFeatureBean、IFeature
 - 异常处理：CalculateException（统一的计算异常类型）
 - 枚举：FeatureEnums、FeatureStates
-- 测试样例：OuterFeatureBean、Test
+- 测试样例：OuterFeatureBean、Test、FeatureEngineAdvancedTest
 
 ```mermaid
 graph TB
@@ -62,17 +66,22 @@ AFB["AbstractFeatureBean<br/>抽象Bean"] --> NFB
 IF["IFeature<br/>执行接口"] --> NFB
 FE --> FE2["calc()/calcWithOuterFeatureBean()<br/>对外API"]
 FE --> DC["destroy()<br/>资源清理"]
+FAT["FeatureEngineAdvancedTest<br/>高级功能测试"] --> FE
+FAT --> FC
+FAT --> CE
 ```
 
 **图表来源**
-- [FeatureEngine.java:75-324](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L324)
-- [FeatureContext.java:23-298](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L298)
+- [FeatureEngine.java:75-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L325)
+- [FeatureContext.java:23-400](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L400)
 - [CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
+- [FeatureEngineAdvancedTest.java:49-271](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L49-L271)
 
 **章节来源**
-- [FeatureEngine.java:75-324](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L324)
-- [FeatureContext.java:23-298](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L298)
+- [FeatureEngine.java:75-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L325)
+- [FeatureContext.java:23-400](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L400)
 - [CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
+- [FeatureEngineAdvancedTest.java:49-271](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L49-L271)
 
 ## 核心组件
 - FeatureEngine：对外暴露calc()与calcWithOuterFeatureBean()系列API，实现DisposableBean接口，封装线程池、超时与调试开关，协调FeatureContext完成计算，并提供资源清理功能。
@@ -82,13 +91,15 @@ FE --> DC["destroy()<br/>资源清理"]
 - FeatureProperties：线程池大小与计算超时默认值。
 - CalculateException：统一的计算异常类型，继承RuntimeException。
 - FeatureEnums/FeatureStates：特征类型与状态枚举。
+- FeatureEngineAdvancedTest：高级功能测试，验证线程池资源管理、异常处理、返回结果完整性等。
 
-**更新** FeatureEngine现在实现DisposableBean接口，提供afterPropertiesSet()初始化和destroy()资源清理功能。
+**更新** FeatureEngine现在实现DisposableBean接口，提供afterPropertiesSet()初始化和destroy()资源清理功能。新增FeatureEngineAdvancedTest，涵盖高级功能测试场景。
 
 **章节来源**
-- [FeatureEngine.java:75-324](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L324)
-- [FeatureContext.java:23-298](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L298)
+- [FeatureEngine.java:75-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L325)
+- [FeatureContext.java:23-400](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L400)
 - [CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
+- [FeatureEngineAdvancedTest.java:49-271](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L49-L271)
 
 ## 架构总览
 FeatureEngine通过FeatureContext串联"原始数据注入—本地特征实体构建—外部特征实体构建—DAG依赖分析—并发执行—结果收集"的完整流程。本地特征由NativeFeatureProcessor装配，外部特征通过传入Map集成。FeatureEngine实现DisposableBean接口，提供资源管理和优雅关闭。
@@ -115,7 +126,7 @@ E->>TP : "优雅关闭线程池"
 **图表来源**
 - [FeatureEngine.java:102-281](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L102-L281)
 - [FeatureEngine.java:260-281](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L260-L281)
-- [FeatureEngine.java:310-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L323)
+- [FeatureEngine.java:310-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L325)
 
 ## 详细组件分析
 
@@ -198,7 +209,7 @@ E->>TP : "优雅关闭线程池"
   - 与外部系统交互（如远程服务、缓存等）以生成中间变量
 
 - 完整使用示例（路径参考）
-  - 外部Bean定义：[OuterFeatureBean.java:10-16](file://src/test/java/com/github/zh/bean/OuterFeatureBean.java#L10-L16)
+  - 外部Bean定义：[OuterFeatureBean.java:27-32](file://src/test/java/com/github/zh/bean/OuterFeatureBean.java#L27-L32)
   - 使用外部Bean计算：[README.md:218-229](file://README.md#L218-L229)
 
 - 性能特点
@@ -230,8 +241,8 @@ E->>TP : "优雅关闭线程池"
 **新增章节** FeatureEngine现在实现DisposableBean接口，提供完整的资源生命周期管理。
 
 **章节来源**
-- [FeatureEngine.java:293-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L323)
-- [FeatureProperties.java:82-104](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L82-L104)
+- [FeatureEngine.java:293-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L325)
+- [FeatureProperties.java:82-106](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L82-L106)
 
 ### 统一计算入口doCalc()
 - 设计目的
@@ -298,9 +309,68 @@ FeatureEngine --> CalculateException : "抛出统一异常"
 ```
 
 **图表来源**
-- [FeatureEngine.java:75-324](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L324)
-- [FeatureContext.java:23-298](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L298)
+- [FeatureEngine.java:75-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L325)
+- [FeatureContext.java:23-400](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L400)
 - [CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
+
+## 高级功能测试
+
+### 线程池资源管理测试
+- 测试目标：验证FeatureEngine.destroy()方法正确关闭线程池
+- 关键测试点：
+  - testDestroyShutdownsThreadPool：验证线程池在destroy()后被正确关闭
+  - testDestroyHandlesAlreadyShutdownPool：验证对已关闭线程池的二次destroy不会抛出异常
+
+- 测试方法
+  - 创建独立的FeatureEngine实例并设置自定义线程池
+  - 调用destroy()方法
+  - 验证线程池状态变为shutdown
+
+**章节来源**
+- [FeatureEngineAdvancedTest.java:59-101](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L59-L101)
+
+### 异常处理路径测试
+- 测试目标：验证各种异常场景的处理机制
+- 关键测试点：
+  - testCalcWithMixedExistentAndNonExistentFeatures：混合存在和不存在的特征计算
+  - testCalcWithTimeoutShouldCompleteNormally：超时处理机制
+  - testCalcInterruptedExceptionHandling：线程中断异常处理
+
+- 测试方法
+  - 请求混合特征集合，验证只返回存在的特征
+  - 设置极短超时，验证引擎优雅处理超时
+  - 中断计算线程，验证异常处理和中断状态保持
+
+**章节来源**
+- [FeatureEngineAdvancedTest.java:105-163](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L105-L163)
+
+### 返回结果完整性测试
+- 测试目标：验证调试模式下的结果完整性
+- 关键测试点：
+  - testCalcReturnAllTrue：debug=true时返回所有中间结果
+  - testCalcReturnAllFalse：debug=false时只返回输出特征
+  - testCalcWithOriginDataMapNotOverwritten：验证原始数据不被修改
+
+- 测试方法
+  - 验证调试模式下包含所有中间特征（包括output=false的特征）
+  - 验证非调试模式下只包含输出特征
+  - 验证原始数据映射在计算后保持不变
+
+**章节来源**
+- [FeatureEngineAdvancedTest.java:167-230](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L167-L230)
+
+### 配置属性测试
+- 测试目标：验证FeatureProperties的默认值和常量
+- 关键测试点：
+  - testFeaturePropertiesDefaultValues：验证默认配置值
+  - testFeaturePropertiesConstants：验证常量值
+
+- 测试方法
+  - 验证线程池大小、最大线程数、超时时间、线程池名称前缀的默认值
+  - 验证常量DEFAULT_POOL_SIZE_MULTIPLIER、DEFAULT_THREAD_POOL_NAME_PREFIX等
+
+**章节来源**
+- [FeatureEngineAdvancedTest.java:234-270](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L234-L270)
 
 ## 依赖分析
 - 组件耦合
@@ -321,14 +391,18 @@ A --> D["FeatureProperties"]
 A --> E["CalculateException"]
 C --> F["NativeFeatureBean"]
 F --> G["IFeature"]
+H["FeatureEngineAdvancedTest"] --> A
+H --> B
+H --> E
 ```
 
-**更新** 新增CalculateException依赖，提供统一的异常处理机制。
+**更新** 新增CalculateException依赖，提供统一的异常处理机制。新增FeatureEngineAdvancedTest依赖，展示高级功能测试。
 
 **图表来源**
-- [FeatureEngine.java:75-324](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L324)
-- [FeatureContext.java:23-298](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L298)
+- [FeatureEngine.java:75-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L75-L325)
+- [FeatureContext.java:23-400](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L23-L400)
 - [CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
+- [FeatureEngineAdvancedTest.java:49-271](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L49-L271)
 
 ## 性能考虑
 - 线程池参数对性能的影响
@@ -346,11 +420,12 @@ F --> G["IFeature"]
   - 优雅关闭机制避免线程池泄漏
   - 合理的超时设置平衡性能与稳定性
 
-**更新** 新增资源管理优化建议，强调优雅关闭和线程池泄漏防护。
+**更新** 新增资源管理优化建议，强调优雅关闭和线程池泄漏防护。基于FeatureEngineAdvancedTest的测试结果，验证了线程池资源管理的有效性。
 
 **章节来源**
-- [FeatureProperties.java:82-104](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L82-L104)
-- [FeatureEngine.java:293-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L323)
+- [FeatureProperties.java:82-106](file://src/main/java/com/github/zh/engine/properties/FeatureProperties.java#L82-L106)
+- [FeatureEngine.java:293-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L325)
+- [FeatureEngineAdvancedTest.java:59-101](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L59-L101)
 
 ## 故障排查指南
 - 常见异常与处理
@@ -359,23 +434,26 @@ F --> G["IFeature"]
   - 缺少依赖或输入：putMiddleFeatureEntity阶段检测缺失，需补充原始数据或Bean
   - 调试定位：开启debug模式查看全部中间结果，快速定位失败节点
   - 线程池异常：优雅关闭失败时检查线程池状态和任务完成情况
+  - 线程中断：正确处理InterruptedException并恢复中断状态
 - 最佳实践
   - 明确输出变量：仅标记需要返回的变量为输出，减少结果Map体积
   - 控制并发度：根据业务特征选择合适的线程池大小
   - 避免循环依赖：编码时确保DAG无环，必要时通过原始数据打断
   - 超时与降级：为关键路径设置合理超时，必要时启用快速失败策略
   - 资源管理：确保应用正常关闭，让FeatureEngine执行destroy()进行资源清理
+  - 异常处理：使用CalculateException统一处理计算异常，避免异常类型混乱
 
-**更新** 新增线程池异常处理和资源管理最佳实践。
+**更新** 新增线程中断处理和资源管理最佳实践。基于FeatureEngineAdvancedTest的测试结果，提供了更完善的异常处理指导。
 
 **章节来源**
 - [FeatureContext.java:92-104](file://src/main/java/com/github/zh/engine/co/FeatureContext.java#L92-L104)
-- [FeatureEngine.java:310-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L323)
+- [FeatureEngine.java:310-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L325)
+- [FeatureEngineAdvancedTest.java:133-163](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L133-L163)
 
 ## 结论
-FeatureEngine通过清晰的API分层与上下文驱动的并发执行，提供了灵活、可扩展的特征计算能力。calc()系列满足基础与高级需求，calcWithOuterFeatureBean()系列支持外部能力集成。通过实现DisposableBean接口，FeatureEngine现在具备完整的资源生命周期管理能力，统一的doCalc()方法增强了代码一致性和维护性。通过合理配置线程池与超时参数，结合调试模式与最佳实践，可在保证性能的同时提升稳定性与可观测性。
+FeatureEngine通过清晰的API分层与上下文驱动的并发执行，提供了灵活、可扩展的特征计算能力。calc()系列满足基础与高级需求，calcWithOuterFeatureBean()系列支持外部能力集成。通过实现DisposableBean接口，FeatureEngine现在具备完整的资源生命周期管理能力，统一的doCalc()方法增强了代码一致性和维护性。基于FeatureEngineAdvancedTest的高级功能测试，验证了线程池资源管理、异常处理、调试模式等功能的可靠性。通过合理配置线程池与超时参数，结合调试模式与最佳实践，可在保证性能的同时提升稳定性与可观测性。
 
-**更新** FeatureEngine现在提供完整的资源管理生命周期，统一的计算入口和增强的异常处理机制，进一步提升了系统的稳定性和可维护性。
+**更新** FeatureEngine现在提供完整的资源管理生命周期，统一的计算入口和增强的异常处理机制，进一步提升了系统的稳定性和可维护性。高级功能测试验证了系统的健壮性和可靠性。
 
 ## 附录
 - API一览（路径参考）
@@ -388,13 +466,16 @@ FeatureEngine通过清晰的API分层与上下文驱动的并发执行，提供�
   - 外部Bean调试：[FeatureEngine.java:212-215](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L212-L215)
   - 外部Bean全量：[FeatureEngine.java:235-239](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L235-L239)
   - 统一计算入口：[FeatureEngine.java:260-281](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L260-L281)
-  - 资源清理：[FeatureEngine.java:310-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L323)
+  - 资源清理：[FeatureEngine.java:310-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L310-L325)
 - 示例参考
   - 基础调用：[README.md:122-125](file://README.md#L122-L125)
   - 外部Bean集成：[README.md:218-229](file://README.md#L218-L229)
 - 测试样例
-  - 外部Bean实现：[OuterFeatureBean.java:10-16](file://src/test/java/com/github/zh/bean/OuterFeatureBean.java#L10-L16)
-  - 本地特征示例：[Test.java:23-71](file://src/test/java/com/github/zh/feature/Test.java#L23-L71)
+  - 外部Bean实现：[OuterFeatureBean.java:27-32](file://src/test/java/com/github/zh/bean/OuterFeatureBean.java#L27-L32)
+  - 本地特征示例：[Test.java:40-85](file://src/test/java/com/github/zh/feature/Test.java#L40-L85)
+  - 高级功能测试：[FeatureEngineAdvancedTest.java:49-271](file://src/test/java/com/github/zh/FeatureEngineAdvancedTest.java#L49-L271)
 - 异常处理
   - 统一异常类型：[CalculateException.java:43-73](file://src/main/java/com/github/zh/engine/exception/CalculateException.java#L43-L73)
-  - 资源管理：[FeatureEngine.java:293-323](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L323)
+  - 资源管理：[FeatureEngine.java:293-325](file://src/main/java/com/github/zh/engine/FeatureEngine.java#L293-L325)
+- 配置示例
+  - 应用配置：[application.yml:4-9](file://src/test/resources/application.yml#L4-L9)

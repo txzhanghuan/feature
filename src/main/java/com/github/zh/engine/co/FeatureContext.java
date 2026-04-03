@@ -20,15 +20,18 @@ package com.github.zh.engine.co;
 import com.github.zh.engine.enums.FeatureEnums;
 import com.github.zh.engine.enums.FeatureStates;
 import com.github.zh.engine.exception.CalculateException;
-import com.github.zh.engine.tools.CycleAnalysis;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Execution context for a single feature computation request.
@@ -50,9 +53,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * The context should not be reused across multiple computation requests.
  * </p>
  *
- * @author 阿桓
+ * @author zhanghuan
  * Date: 2020/3/20
- * Time: 3:09 下午
+ * Time: 3:09 PM
  * @see FeatureEntity
  * @see FeatureEngine
  */
@@ -91,7 +94,7 @@ public class FeatureContext {
      */
     public void executeAll(long timeout, Map<String, String> logContext) throws InterruptedException {
         if (needCalcFeaturesCount == 0) {
-            throw new CalculateException("无变量需计算");
+            throw new CalculateException("No features need to be calculated");
         }
         featureEntitiesPool.values().forEach(
                 featureEntity -> CompletableFuture.runAsync(
@@ -99,7 +102,7 @@ public class FeatureContext {
                         , pool)
         );
         if (!this.countDownLatch.await(timeout, TimeUnit.MILLISECONDS)) {
-            throw new CalculateException("计算超时");
+            throw new CalculateException("Calculation timeout");
         }
     }
 
@@ -146,12 +149,7 @@ public class FeatureContext {
      * Performs the following steps:
      * <ol>
      *   <li>Sets up the thread pool reference</li>
-     *   <li>Injects origin data as pre-computed feature entities</li>
-     *   <li>Injects outer feature entities if provided</li>
-     *   <li>Initializes native feature entities for requested features</li>
-     *   <li>Resolves and adds intermediate dependency features</li>
-     *   <li>Reconstructs parent-child relationships (for outer beans)</li>
-     *   <li>Performs cycle detection analysis</li>
+     *   <li>Delegates DAG construction to {@link FeatureDAGBuilder}</li>
      *   <li>Initializes the countdown latch</li>
      * </ol>
      * </p>
@@ -165,186 +163,33 @@ public class FeatureContext {
     private void doInit(ThreadPoolExecutor pool, Map<String, Object> originDataMap, Set<String> calcFeatures,
                         Map<String, AbstractFeatureBean> featureBeanMap,
                         Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
-        //指定计算线程池
+        // Set up the thread pool
         this.pool = pool;
 
-        //注入原始数据
-        initOriginData(originDataMap);
-
-        //注入外部所需计算的FeatureEntity（如果有）
-        if (outerFeatureBeanMap != null) {
-            initOuterFeatureEntity(outerFeatureBeanMap);
-        }
-
-        //注入需要计算的NativeFeatureEntity
-        initNativeFeatureEntity(calcFeatures, featureBeanMap);
-
-        //注入计算所依赖的FeatureEntity
-        putMiddleFeatureEntity(featureBeanMap);
-
-        //重新构建依赖关系（带外部Bean时需要）
-        if (outerFeatureBeanMap != null) {
-            constructFeatureBeanChildren();
-        }
-
-        //环分析
-        cycleAnalysis();
-
-        //初始化需要计算的变量个数
-        initCountDownLatch();
-    }
-
-    /**
-     * Performs cycle detection analysis on the feature dependency graph.
-     * <p>
-     * Currently disabled but can be enabled to detect circular dependencies
-     * in the feature computation graph.
-     * </p>
-     *
-     * @see CycleAnalysis#isCycle(Map)
-     */
-    private void cycleAnalysis() {
-
-//        if (CycleAnalysis.isCycle(featureEntitiesPool)) {
-//            throw new CalculateException("These features entities has a cycle!");
-//        }
-
-    }
-
-    private void constructFeatureBeanChildren() {
-        featureEntitiesPool.forEach(
-                (key, featureEntity) -> featureEntity.getParents().forEach(
-                        parent -> {
-                            if (featureEntitiesPool.containsKey(parent) && !featureEntitiesPool.get(parent).getChildren().contains(key)) {
-                                featureEntitiesPool.get(parent).getChildren().add(key);
-                            }
-                        }
-                )
+        // Build DAG using FeatureDAGBuilder
+        FeatureDAGBuilder dagBuilder = new FeatureDAGBuilder(
+                this,
+                featureEntitiesPool,
+                featureBeanMap,
+                originDataMap,
+                calcFeatures,
+                outerFeatureBeanMap
         );
-    }
+        this.needCalcFeaturesCount = dagBuilder.build();
 
-    private void initCountDownLatch() {
+        // Initialize the countdown latch for feature count
         this.countDownLatch = new CountDownLatch(needCalcFeaturesCount);
     }
 
     /**
-     * Injects origin data as pre-computed feature entities with SUCCESS status.
+     * Checks if any feature computation has failed and throws an exception.
      * <p>
-     * Origin data is treated as features that are already computed, so their
-     * status is set to SUCCESS immediately.
+     * If fast-fail mode is active, finds the root cause of the failure
+     * and throws a {@link CalculateException} with details.
      * </p>
      *
-     * @param originDataMap the map of origin data where keys are parameter names
+     * @throws CalculateException if any feature has failed during computation
      */
-    private void initOriginData(Map<String, Object> originDataMap) {
-        if (originDataMap == null) {
-            return;
-        }
-        originDataMap.forEach((key, value) -> {
-            FeatureEntity featureEntity = FeatureEntity.builder()
-                    .featureContext(this)
-                    .parents(new ArrayList<>())
-                    .children(new ArrayList<>())
-                    .featureEnum(FeatureEnums.ORIGIN_DATA)
-                    .status(new AtomicReference<>(FeatureStates.SUCCESS))
-                    .result(value)
-                    .featureBean(null)
-                    .build();
-            featureEntitiesPool.putIfAbsent(key, featureEntity);
-        });
-    }
-
-    /**
-     * Injects externally provided feature beans as feature entities.
-     *
-     * @param outerFeatureBeanMap the map of external feature beans to inject
-     */
-    private void initOuterFeatureEntity(Map<String, ? extends AbstractFeatureBean> outerFeatureBeanMap) {
-        outerFeatureBeanMap.forEach((key, value) -> {
-            FeatureEntity featureEntity = FeatureEntity.builder()
-                    .featureContext(this)
-                    .parents(CollectionUtils.isEmpty(value.parents) ? new ArrayList<>() : new ArrayList<>(value.parents))
-                    .children(CollectionUtils.isEmpty(value.children) ? new ArrayList<>() : new ArrayList<>(value.children))
-                    .featureEnum(FeatureEnums.OUTER_FEATURE)
-                    .featureBean(value)
-                    .build();
-            if (!featureEntitiesPool.containsKey(key)) {
-                featureEntitiesPool.put(key, featureEntity);
-                needCalcFeaturesCount++;
-            }
-        });
-    }
-
-    /**
-     * Injects native (locally defined) feature entities for the requested features.
-     *
-     * @param calcFeatures   the set of feature names to be calculated
-     * @param featureBeanMap the map of available native feature beans
-     */
-    private void initNativeFeatureEntity(Set<String> calcFeatures, Map<String, AbstractFeatureBean> featureBeanMap) {
-        calcFeatures.forEach(feature -> {
-            if (!featureBeanMap.containsKey(feature)) {
-                return;
-            }
-            FeatureEntity featureEntity = FeatureEntity.builder()
-                    .featureContext(this)
-                    .parents(CollectionUtils.isEmpty(featureBeanMap.get(feature).parents) ? new ArrayList<>() : new ArrayList<>(featureBeanMap.get(feature).parents))
-                    .children(CollectionUtils.isEmpty(featureBeanMap.get(feature).children) ? new ArrayList<>() : new ArrayList<>(featureBeanMap.get(feature).children))
-                    .featureEnum(FeatureEnums.NATIVE_FEATURE)
-                    .featureBean(featureBeanMap.get(feature))
-                    .build();
-            if (!featureEntitiesPool.containsKey(feature)) {
-                featureEntitiesPool.put(feature, featureEntity);
-                needCalcFeaturesCount++;
-            }
-        });
-    }
-
-    /**
-     * Resolves and injects intermediate feature entities required for dependency resolution.
-     * <p>
-     * Uses BFS to traverse the dependency graph and add all required intermediate features
-     * that are not yet in the pool.
-     * </p>
-     *
-     * @param featureBeanMap the map of available native feature beans
-     * @throws CalculateException if a required feature or input parameter is missing
-     */
-    private void putMiddleFeatureEntity(Map<String, AbstractFeatureBean> featureBeanMap) {
-        Queue<String> queue = new LinkedBlockingDeque<>();
-        insertToQueue(queue);
-        while (!queue.isEmpty()) {
-            String currentEntityKey = queue.poll();
-            if (!featureBeanMap.containsKey(currentEntityKey) && !featureEntitiesPool.containsKey(currentEntityKey)) {
-                throw new CalculateException(String.format("缺少Feature或者输入参数: %s", currentEntityKey));
-            }
-            FeatureEntity featureEntity = FeatureEntity.builder()
-                    .featureContext(this)
-                    .parents(new ArrayList<>(featureBeanMap.get(currentEntityKey).parents))
-                    .children(new ArrayList<>(featureBeanMap.get(currentEntityKey).children))
-                    .featureEnum(FeatureEnums.NATIVE_FEATURE)
-                    .featureBean(featureBeanMap.get(currentEntityKey))
-                    .build();
-            if (!featureEntitiesPool.containsKey(currentEntityKey)) {
-                featureEntitiesPool.put(currentEntityKey, featureEntity);
-                needCalcFeaturesCount++;
-            }
-            insertToQueue(queue);
-        }
-    }
-
-    private void insertToQueue(Queue<String> queue) {
-        featureEntitiesPool.values().stream().filter(
-                it -> !it.getFeatureEnum().equals(FeatureEnums.ORIGIN_DATA)
-        ).forEach(
-                it -> it.getParents().stream().filter(
-                        tempParent -> !featureEntitiesPool.containsKey(tempParent)
-                ).forEach(
-                        queue::offer
-                )
-        );
-    }
-
     private void checkFail() {
         if (fastFail) {
             FeatureEntity featureEntity = featureEntitiesPool.values().stream().filter(

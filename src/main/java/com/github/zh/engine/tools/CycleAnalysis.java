@@ -87,7 +87,7 @@ public class CycleAnalysis {
                 }
 
                 if (nodeColor.get(child).equals(Color.BLACK)) {
-                    log.error("FeatureEntityGraph round the {} node is a cycle", child);
+                    log.error("Cycle detected at node: {}", child);
                     return true;
                 }
 

@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author zhanghuan
  * Date: 2020/4/2
- * Time: 2:54 下午
+ * Time: 2:54 PM
  * @see com.github.zh.engine.FeatureEngine
  * @see com.github.zh.engine.config.FeatureAutoConfiguration
  */

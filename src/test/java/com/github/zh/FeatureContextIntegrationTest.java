@@ -20,6 +20,7 @@ package com.github.zh;
 import com.github.zh.engine.FeatureEngine;
 import com.github.zh.engine.co.AbstractFeatureBean;
 import com.github.zh.engine.co.FeatureContext;
+import com.github.zh.engine.co.FeatureDAGBuilder;
 import com.github.zh.engine.co.FeatureEntity;
 import com.github.zh.engine.enums.FeatureEnums;
 import com.github.zh.engine.enums.FeatureStates;
@@ -368,7 +369,7 @@ public class FeatureContextIntegrationTest {
                 fail("Should throw CalculateException due to timeout");
             } catch (CalculateException e) {
                 assertTrue("Exception message should indicate timeout",
-                        e.getMessage().contains("超时"));
+                        e.getMessage().contains("timeout") || e.getMessage().contains("Timeout"));
             }
         } finally {
             pool.shutdown();
@@ -390,9 +391,16 @@ public class FeatureContextIntegrationTest {
             // Use reflection to access init method behavior
             setFieldValue(context, "pool", pool);
 
-            // Call initOriginData through reflection
-            invokePrivateMethod(context, "initOriginData",
-                    new Class<?>[]{Map.class}, originDataMap);
+            // Use FeatureDAGBuilder to initialize origin data
+            FeatureDAGBuilder dagBuilder = new FeatureDAGBuilder(
+                    context,
+                    context.getFeatureEntitiesPool(),
+                    new HashMap<>(),
+                    originDataMap,
+                    new HashSet<>(),
+                    null
+            );
+            dagBuilder.build();
 
             // Verify origin data was added to the pool
             assertTrue("Should contain input1", context.getFeatureEntitiesPool().containsKey("input1"));

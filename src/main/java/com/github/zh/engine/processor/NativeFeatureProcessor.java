@@ -79,8 +79,8 @@ public class NativeFeatureProcessor extends AbstractFeatureProcessor<NativeFeatu
      * @param bean     the bean instance to process
      * @param beanName the name of the bean
      * @return the original bean (unmodified)
-     * @throws BeansException        if bean processing fails
-     * @throws FeatureCreationException if feature generation fails
+     * @throws BeansException           if bean processing fails
+     * @throws FeatureCreationException if feature generation or bean creation fails
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {

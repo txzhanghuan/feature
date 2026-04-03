@@ -17,18 +17,22 @@
 
 package com.github.zh.engine.cache;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 
 /**
- * @author ahuan.zh
+ * Default in-memory implementation of {@link CacheWrapper}.
+ *
+ * @author zhanghuan
  * @version 1.0
  * @date 2022/3/3 20:04
- * @deprecated Reserved for future use. Not currently used in the engine.
+ * @deprecated See {@link CacheWrapper}. Reserved for future use. Not currently utilized in the engine.
  */
 @Deprecated
 @Component
+@ConditionalOnProperty(name = "feature.cache.enabled", havingValue = "true", matchIfMissing = false)
 public class DefaultCacheImpl implements CacheWrapper {
 
     private final HashSet<String> hashSet = new HashSet<>();

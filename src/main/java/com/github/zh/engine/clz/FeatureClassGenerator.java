@@ -120,7 +120,7 @@ public class FeatureClassGenerator {
         int parameterTypesLength = parameterTypes.length;
         int parametersLength = parameters.length;
         if (parameterTypesLength != parametersLength) {
-            throw new CannotCompileException("参数类型个数和参数个数不匹配");
+            throw new CannotCompileException("Parameter type count and parameter count do not match");
         }
         StringBuilder paramsStr = new StringBuilder();
         String template = "(%s)args[%s]";
@@ -148,7 +148,7 @@ public class FeatureClassGenerator {
         int parameterTypesLength = parameterTypes.length;
         int parametersLength = parameters.length;
         if (parameterTypesLength != parametersLength) {
-            throw new CannotCompileException("参数类型个数和参数个数不匹配");
+            throw new CannotCompileException("Parameter type count and parameter count do not match");
         }
         StringBuilder paramsStr = new StringBuilder();
         for (int i = 0; i < parameterTypesLength; i++) {

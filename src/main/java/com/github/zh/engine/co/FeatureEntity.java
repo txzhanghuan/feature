@@ -118,7 +118,7 @@ public class FeatureEntity {
         //Check if Context has already failed
         if (this.featureContext.isFastFail()) {
             if (status.compareAndSet(FeatureStates.INIT, FeatureStates.FAILED)) {
-                log.debug("Feature: {}， fast failed.", featureBean.getName());
+                log.debug("Feature: {}, fast failed.", featureBean.getName());
                 this.featureContext.getCountDownLatch().countDown();
 
                 MDC.clear();
@@ -162,9 +162,9 @@ public class FeatureEntity {
                 result = featureBean.execute(args.toArray());
                 stopWatch.stop();
                 status.set(FeatureStates.SUCCESS);
-                log.debug("Thread：{}, feature: {}, result: {}. complete, cost(ms)：{}", Thread.currentThread().getName(), this.getFeatureBean().getName(), result, stopWatch.getTotalTimeMillis());
+                log.debug("Thread: {}, feature: {}, result: {}. complete, cost(ms): {}", Thread.currentThread().getName(), this.getFeatureBean().getName(), result, stopWatch.getTotalTimeMillis());
             } catch (Exception e) {
-                log.error("Feature: {}, failed. input param：{}", featureBean.getName(), args, e);
+                log.error("Feature: {}, failed. input parameters: {}", featureBean.getName(), args, e);
                 error = e;
                 status.set(FeatureStates.FAILED);
                 this.featureContext.setFastFail(true);
@@ -202,7 +202,7 @@ public class FeatureEntity {
     /**
      * Checks whether all parent features have completed (either SUCCESS or FAILED).
      *
-     * @return true if all parent features have reached an end state; false otherwise
+     * @return {@code true} if all parent features have reached an end state; {@code false} otherwise
      */
     private boolean checkParamsReady() {
         return parents.stream().allMatch(
