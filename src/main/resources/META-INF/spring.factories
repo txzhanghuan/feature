@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.zh.engine.config.FeatureAutoConfiguration
+top.volusus.engine.config.FeatureAutoConfiguration
