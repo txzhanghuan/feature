@@ -38,7 +38,6 @@ import java.util.List;
  *   <li>{@code parents} - List of feature names this feature depends on (inputs)</li>
  *   <li>{@code children} - List of feature names that depend on this feature</li>
  * </ul>
- * </p>
  * <p>
  * <b>Thread Safety:</b> This class is not thread-safe by design. Feature beans are typically
  * created during application initialization and remain immutable afterward.

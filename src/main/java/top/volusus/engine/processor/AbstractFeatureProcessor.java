@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>Post-processing support via {@link FeatureBeanPostProcessor}</li>
  *   <li>Dependency graph construction (parent-child relationships)</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Thread Safety:</b> Uses {@link ConcurrentHashMap} for thread-safe feature bean storage.
  * </p>
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <T> the type of feature bean this processor handles, must extend {@link AbstractFeatureBean}
  * @author zhanghuan
  * @version 1.0
- * @date 2021/9/17 14:48
+ * @since 2021/9/17 14:48
  * @see AbstractFeatureBean
  * @see FeatureBeanPostProcessor
  * @see NativeFeatureProcessor

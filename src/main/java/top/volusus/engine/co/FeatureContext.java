@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
  *   <li>Tracking computation completion via {@link CountDownLatch}</li>
  *   <li>Handling fast-fail scenarios when any feature computation fails</li>
  * </ul>
- * </p>
  * <p>
  * <b>Thread Safety:</b> This class uses {@link ConcurrentHashMap} for thread-safe access to feature entities.
  * The {@code fastFail} flag is volatile to ensure visibility across threads.
@@ -57,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  * Date: 2020/3/20
  * Time: 3:09 PM
  * @see FeatureEntity
- * @see FeatureEngine
+ * @see top.volusus.engine.FeatureEngine
  */
 @Slf4j
 public class FeatureContext {

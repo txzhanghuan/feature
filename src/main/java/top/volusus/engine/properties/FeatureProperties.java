@@ -40,7 +40,6 @@ import org.springframework.context.annotation.Configuration;
  *           calcTimeout: 5000
  *           threadPoolNamePrefix: "my-feature-pool-"
  * </pre>
- * </p>
  *
  * @author zhanghuan
  * Date: 2020/4/2

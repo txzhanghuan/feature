@@ -26,7 +26,6 @@ package top.volusus.engine.enums;
  *   <li>{@link #NATIVE_FEATURE} - Features defined locally via {@code @Feature} annotation</li>
  *   <li>{@link #OUTER_FEATURE} - Features provided externally at runtime</li>
  * </ul>
- * </p>
  *
  * @author zhanghuan
  * Date: 2020/3/26

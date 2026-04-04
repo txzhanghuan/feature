@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *   <li>Constructing parent-child relationships between features</li>
  *   <li>Performing cycle detection analysis</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Usage:</b> Create an instance with the required dependencies, then call {@link #build()}
  * to construct the DAG. The builder populates the provided feature entities pool.
@@ -107,7 +107,6 @@ public class FeatureDAGBuilder {
      *   <li>Reconstructs parent-child relationships (for outer beans)</li>
      *   <li>Performs cycle detection analysis</li>
      * </ol>
-     * </p>
      *
      * @return the count of features that need to be calculated
      */

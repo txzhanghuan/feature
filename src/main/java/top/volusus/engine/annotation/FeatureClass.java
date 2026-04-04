@@ -32,7 +32,7 @@ import java.lang.annotation.*;
  *   <li>The class should be a Spring-managed bean (annotated with {@code @Component} or similar)</li>
  *   <li>Feature methods within must be annotated with {@link Feature}</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Example:</b>
  * <pre>
@@ -47,10 +47,9 @@ import java.lang.annotation.*;
  * }
  * }
  * </pre>
- * </p>
  *
  * @author zhanghuan
- * @date 2020/01/27
+ * @since 2020/01/27
  * @see Feature
  * @see top.volusus.engine.processor.NativeFeatureProcessor
  */

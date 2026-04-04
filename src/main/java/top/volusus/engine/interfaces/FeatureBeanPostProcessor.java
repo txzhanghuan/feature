@@ -51,7 +51,6 @@ import org.springframework.beans.BeansException;
  * }
  * }
  * </pre>
- * </p>
  *
  * @param <T> the type of feature bean this processor handles
  * @author zhanghuan

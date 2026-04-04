@@ -19,6 +19,7 @@ package top.volusus.engine;
 
 import top.volusus.engine.co.AbstractFeatureBean;
 import top.volusus.engine.co.FeatureContext;
+import top.volusus.engine.exception.CalculateException;
 import top.volusus.engine.processor.NativeFeatureProcessor;
 import top.volusus.engine.properties.FeatureProperties;
 import lombok.Setter;
@@ -61,7 +62,6 @@ import java.util.concurrent.TimeUnit;
  * Map<String, Object> result = featureEngine.calc(originData, features);
  * }
  * </pre>
- * </p>
  *
  * @author 阿桓
  * Date: 2020/3/25
@@ -88,8 +88,7 @@ public class FeatureEngine implements InitializingBean, DisposableBean {
     /**
      * Calculates features using only native (locally defined) FeatureBeans.
      * <p>
-     * Uses the default timeout configured in {@link FeatureProperties#getCalcTimeout()}.
-     * </p>
+     * Uses the default timeout configured in {@link FeatureProperties}.
      *
      * @param originDataMap the original input data map where keys are parameter names and values are input values
      * @param calcFeatures  the set of feature names to be calculated
@@ -161,9 +160,8 @@ public class FeatureEngine implements InitializingBean, DisposableBean {
     /**
      * Calculates features using both native (locally defined) and outer (externally provided) FeatureBeans.
      * <p>
-     * Uses the default timeout configured in {@link FeatureProperties#getCalcTimeout()}.
+     * Uses the default timeout configured in {@link FeatureProperties}.
      * Outer feature beans can be used to inject dynamic computation logic at runtime.
-     * </p>
      *
      * @param originDataMap    the original input data map where keys are parameter names and values are input values
      * @param calcFeatures     the set of feature names to be calculated
@@ -283,9 +281,8 @@ public class FeatureEngine implements InitializingBean, DisposableBean {
     /**
      * Initializes the thread pool after bean properties are set.
      * <p>
-     * If no custom thread pool is provided via {@link #setCalcPool(ThreadPoolExecutor)},
+     * If no custom thread pool is provided via {@code setCalcPool(ThreadPoolExecutor)},
      * this method creates a default thread pool based on the configuration in {@link FeatureProperties}.
-     * </p>
      *
      * @throws Exception if initialization fails
      * @see InitializingBean#afterPropertiesSet()

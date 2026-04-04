@@ -31,14 +31,14 @@ import java.lang.reflect.Parameter;
  *   <li>Implements the {@link IFeature#execute(Object[])} method</li>
  *   <li>Delegates to the original annotated method with proper type casting</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Thread Safety:</b> The static class pool is shared but Javassist handles
  * concurrent class generation safely.
  * </p>
  *
  * @author zhanghuan
- * @date 2020/01/27
+ * @since 2020/01/27
  * @see IFeature
  * @see AbstractFeature
  * @see top.volusus.engine.processor.NativeFeatureProcessor

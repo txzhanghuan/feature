@@ -39,11 +39,10 @@ import java.lang.annotation.*;
  * }
  * }
  * </pre>
- * </p>
  *
  * @author zhanghuan
  * @version 1.0
- * @date 2021/9/17 16:41
+ * @since 2021/9/17 16:41
  * @see Property
  */
 @Target({ElementType.METHOD})

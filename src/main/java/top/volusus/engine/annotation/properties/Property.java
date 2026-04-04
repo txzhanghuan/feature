@@ -42,13 +42,12 @@ import java.lang.annotation.*;
  * }
  * }
  * </pre>
- * </p>
  *
  * @author zhanghuan
  * @version 1.0
- * @date 2021/9/17 11:41
+ * @since 2021/9/17 11:41
  * @see Properties
- * @see Feature
+ * @see top.volusus.engine.annotation.Feature
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

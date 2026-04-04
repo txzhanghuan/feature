@@ -95,7 +95,7 @@ public class FeatureEntity {
      *   <li>Executes the actual computation</li>
      *   <li>Notifies children features upon completion</li>
      * </ol>
-     * </p>
+     *
      * <p>
      * <b>State Transitions:</b> INIT → PROCESSING → SUCCESS/FAILED
      * </p>

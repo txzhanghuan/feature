@@ -40,11 +40,10 @@ import java.util.stream.Collectors;
  *   <li>BLACK - Node fully processed (all children visited)</li>
  * </ul>
  * A cycle is detected when a GREY node is encountered during traversal.
- * </p>
  *
  * @author zhanghuan
  * @version 1.0
- * @date 2022/3/3 19:41
+ * @since 2022/3/3 19:41
  * @see FeatureEntity
  * @see top.volusus.engine.co.FeatureContext
  */

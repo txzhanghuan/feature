@@ -30,7 +30,6 @@ import org.springframework.beans.BeansException;
  *   <li>Feature method signature is invalid</li>
  *   <li>Bean instantiation fails</li>
  * </ul>
- * </p>
  *
  * @author zhanghuan
  * Date: 2020/4/14

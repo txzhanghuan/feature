@@ -40,14 +40,12 @@ import org.springframework.context.annotation.Configuration;
  *   <li>{@link NativeFeatureProcessor} - For scanning and registering feature beans</li>
  *   <li>{@link FeatureEngine} - The core computation engine</li>
  * </ul>
- * </p>
  * <p>
  * <b>Conditions:</b>
  * <ul>
  *   <li>Can be disabled by setting {@code enabled.featureEngine=false}</li>
  *   <li>Only creates beans if they are not already defined</li>
  * </ul>
- * </p>
  *
  * @author zhanghuan
  * Date: 2020/4/3

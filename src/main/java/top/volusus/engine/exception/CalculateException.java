@@ -27,7 +27,7 @@ package top.volusus.engine.exception;
  *   <li>Missing required features or input parameters</li>
  *   <li>Individual feature computation failures</li>
  * </ul>
- * </p>
+ *
  * <p>
  * As a {@link RuntimeException}, this exception does not need to be explicitly
  * declared or caught, making it suitable for use in lambda expressions and

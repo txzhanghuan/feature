@@ -47,14 +47,14 @@ import java.util.stream.Collectors;
  *   <li>Creating and registering {@link NativeFeatureBean} instances</li>
  *   <li>Building the parent-child dependency graph after all beans are processed</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Lifecycle:</b> This processor runs during Spring's bean post-processing phase.
  * The dependency graph is finalized when the application context is refreshed.
  * </p>
  *
  * @author zhanghuan
- * @date 2020/01/27
+ * @since 2020/01/27
  * @see Feature
  * @see FeatureClass
  * @see NativeFeatureBean

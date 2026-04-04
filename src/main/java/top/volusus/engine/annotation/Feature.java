@@ -33,7 +33,7 @@ import java.lang.annotation.*;
  *   <li>The method must be public</li>
  *   <li>Method parameters define the dependencies (parent features)</li>
  * </ul>
- * </p>
+ *
  * <p>
  * <b>Example:</b>
  * <pre>
@@ -48,10 +48,9 @@ import java.lang.annotation.*;
  * }
  * }
  * </pre>
- * </p>
  *
  * @author zhanghuan
- * @date 2020/01/27
+ * @since 2020/01/27
  * @see FeatureClass
  * @see top.volusus.engine.processor.NativeFeatureProcessor
  */
