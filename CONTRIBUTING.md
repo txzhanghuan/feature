@@ -87,7 +87,7 @@ We follow the standard GitHub Flow:
 - **Methods**: camelCase (e.g., `calcFeature`, `getDependencies`)
 - **Variables**: camelCase (e.g., `featureBean`, `calcTimeout`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_TIMEOUT`, `MAX_POOL_SIZE`)
-- **Packages**: lowercase (e.g., `com.github.zh.engine.processor`)
+- **Packages**: lowercase (e.g., `top.volusus.engine.processor`)
 
 ### Comments
 

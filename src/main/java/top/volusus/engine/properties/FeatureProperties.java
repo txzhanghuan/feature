@@ -30,15 +30,14 @@ import org.springframework.context.annotation.Configuration;
  * <p>
  * <b>Example configuration:</b>
  * <pre>
- * com:
- *   github:
- *     zh:
- *       engine:
- *         feature:
- *           featureThreadPoolSize: 16
- *           featureThreadPoolMaxSize: 32
- *           calcTimeout: 5000
- *           threadPoolNamePrefix: "my-feature-pool-"
+ * top:
+ *   volusus:
+ *     engine:
+ *       feature:
+ *         featureThreadPoolSize: 16
+ *         featureThreadPoolMaxSize: 32
+ *         calcTimeout: 5000
+ *         threadPoolNamePrefix: "my-feature-pool-"
  * </pre>
  *
  * @author zhanghuan

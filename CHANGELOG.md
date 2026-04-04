@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-04-04
+
+### Changed
+
+- **GroupId migration**: Changed Maven groupId from `com.github.zh` to `top.volusus`
+- **Package rename**: Migrated all packages from `com.github.zh` to `top.volusus`
+- **Artifact rename**: Changed artifactId to `feature-spring-boot-starter`
+- **Configuration prefix**: Updated configuration prefix from `com.github.zh.engine.feature` to `top.volusus.engine.feature`
+
 ## [1.0.0] - 2026-04-02
 
 ### Added
@@ -35,7 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
+| 2.0.0   | 2026-04-04   | GroupId migration to top.volusus, package rename |
 | 1.0.0   | 2026-04-02   | Initial release with core DAG engine |
 
-[Unreleased]: https://github.com/[USERNAME]/feature/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/[USERNAME]/feature/releases/tag/v1.0.0
+[Unreleased]: https://github.com/txzhanghuan/feature/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/txzhanghuan/feature/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/txzhanghuan/feature/releases/tag/v1.0.0

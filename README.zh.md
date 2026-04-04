@@ -4,7 +4,7 @@
 
 ![Build Status](https://github.com/txzhanghuan/feature/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
-![Maven Central](https://img.shields.io/maven-central/v/com.github.zh/feature-engine.svg)
+![Maven Central](https://img.shields.io/maven-central/v/top.volusus/feature-spring-boot-starter.svg)
 
 ---
 
@@ -89,9 +89,9 @@ sequenceDiagram
 
 ```xml
 <dependency>
-    <groupId>com.github.zh</groupId>
+    <groupId>top.volusus</groupId>
     <artifactId>feature-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -340,15 +340,14 @@ public class MyPostProcessor implements FeatureBeanPostProcessor<NativeFeatureBe
 在 `application.yml` 中配置：
 
 ```yaml
-com:
-  github:
-    zh:
-      engine:
-        feature:
-          featureThreadPoolSize: 16
-          featureThreadPoolMaxSize: 32
-          calcTimeout: 10000
-          threadPoolNamePrefix: "feature-pool-"
+top:
+  volusus:
+    engine:
+      feature:
+        featureThreadPoolSize: 16
+        featureThreadPoolMaxSize: 32
+        calcTimeout: 10000
+        threadPoolNamePrefix: "feature-pool-"
 ```
 
 | 配置项 | 类型 | 默认值 | 说明 |
