@@ -27,6 +27,9 @@ practice.code-workspace
 # macOS
 .DS_Store
 
+# Build artifacts
+META-INF/
+
 # Gradle (future compatibility)
 .gradle/
 build/
