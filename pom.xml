@@ -117,7 +117,7 @@
 
     <name>Feature Engine Spring Boot Starter</name>
     <description>A lightweight feature computation engine with DAG-based dependency resolution and parallel execution</description>
-    <url>https://github.com/zhanghuan/feature-engine</url>
+    <url>https://github.com/txzhanghuan/feature</url>
 
     <licenses>
         <license>
@@ -131,14 +131,14 @@
         <developer>
             <id>zhanghuan</id>
             <name>zhanghuan</name>
-            <url>https://github.com/zhanghuan</url>
+            <url>https://github.com/txzhanghuan</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/zhanghuan/feature-engine.git</connection>
-        <developerConnection>scm:git:ssh://github.com:zhanghuan/feature-engine.git</developerConnection>
-        <url>https://github.com/zhanghuan/feature-engine</url>
+        <connection>scm:git:git://github.com/txzhanghuan/feature.git</connection>
+        <developerConnection>scm:git:ssh://github.com:txzhanghuan/feature.git</developerConnection>
+        <url>https://github.com/txzhanghuan/feature</url>
     </scm>
 
     <dependencies>
