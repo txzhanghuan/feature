@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-04-08
+
+### Changed
+
+- 版本升级至 2.1.0 / Version bump to 2.1.0
+
 ## [2.0.0] - 2026-04-04
 
 ### Changed
@@ -44,9 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
+| 2.1.0   | 2026-04-08   | Version bump to 2.1.0 |
 | 2.0.0   | 2026-04-04   | GroupId migration to top.volusus, package rename |
 | 1.0.0   | 2026-04-02   | Initial release with core DAG engine |
 
-[Unreleased]: https://github.com/txzhanghuan/feature/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/txzhanghuan/feature/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/txzhanghuan/feature/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/txzhanghuan/feature/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/txzhanghuan/feature/releases/tag/v1.0.0

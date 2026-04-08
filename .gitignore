@@ -28,7 +28,8 @@ practice.code-workspace
 .DS_Store
 
 # Build artifacts
-META-INF/
+/META-INF/
+/top/
 
 # Gradle (future compatibility)
 .gradle/
