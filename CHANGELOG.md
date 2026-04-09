@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-09
+
+### Changed
+
+- 版本升级至 2.2.0 / Version bump to 2.2.0
+- 更改开源许可证为 MIT / Changed license to MIT
+
 ## [2.1.0] - 2026-04-08
 
 ### Changed
