@@ -3,7 +3,7 @@
 **轻量级函数计算编排引擎** —— 让复杂计算变得简单
 
 ![Build Status](https://github.com/txzhanghuan/feature/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Maven Central](https://img.shields.io/maven-central/v/top.volusus/feature-spring-boot-starter.svg)
 
 ---
@@ -91,7 +91,7 @@ sequenceDiagram
 <dependency>
     <groupId>top.volusus</groupId>
     <artifactId>feature-spring-boot-starter</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
@@ -441,4 +441,4 @@ top:
 
 ## License
 
-本项目基于 [AGPL-3.0](LICENSE) 许可证开源。
+本项目基于 [MIT](LICENSE) 许可证开源。

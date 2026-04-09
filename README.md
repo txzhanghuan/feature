@@ -3,7 +3,7 @@
 **Lightweight Function Calculation Orchestration Engine** — Making Complex Calculations Simple
 
 ![Build Status](https://github.com/txzhanghuan/feature/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Maven Central](https://img.shields.io/maven-central/v/top.volusus/feature-spring-boot-starter.svg)
 
 ---
@@ -91,7 +91,7 @@ sequenceDiagram
 <dependency>
     <groupId>top.volusus</groupId>
     <artifactId>feature-spring-boot-starter</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
@@ -441,4 +441,4 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
-This project is licensed under the [AGPL-3.0](LICENSE) License.
+This project is licensed under the [MIT](LICENSE) License.

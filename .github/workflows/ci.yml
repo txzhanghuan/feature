@@ -26,7 +26,7 @@ jobs:
           cache: maven
 
       - name: Build and test
-        run: mvn clean verify --batch-mode --no-transfer-progress -DargLine="" -Dgpg.skip=true
+        run: mvn clean test --batch-mode --no-transfer-progress -DargLine=""
 
       - name: Upload test results
         if: always()

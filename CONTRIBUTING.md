@@ -193,7 +193,7 @@ When requesting a feature, please include:
 
 ## License
 
-By contributing to Feature Engine, you agree that your contributions will be licensed under the [AGPL v3 License](LICENSE).
+By contributing to Feature Engine, you agree that your contributions will be licensed under the [MIT License](LICENSE).
 
 ## Questions?
 
